@@ -1,0 +1,85 @@
+# Docker Internals Guide - .gitignore
+
+# Test outputs and logs
+*.log
+results-*.txt
+results-*.log
+baseline.log
+output-*.txt
+
+# Temporary files
+/tmp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test containers and volumes
+test-container-*
+test-volume-*
+
+# Personal notes
+notes.txt
+TODO.md
+scratch/
+
+# Secrets and credentials
+*.pem
+*.key
+*.crt
+secrets/
+.env.local
+
+# Build artifacts
+dist/
+build/
+*.tar.gz
+*.zip
+
+# Documentation builds
+site/
+_site/
+
+# Coverage reports
+coverage/
+.coverage
+htmlcov/
+
+# Backup files
+*.bak
+*.backup
+
+# Local configuration
+local-config.yaml
+custom-benchmarks/

@@ -35,9 +35,9 @@ Average (10 runs):       629ms ⚠️
 
 #### I/O Performance
 ```
-Sequential write:     327 MB/s  ✅
-Volume mount write:   330 MB/s  ✅
-Copy-up overhead:     99ms      ✅
+Sequential write:     327 MB/s  
+Volume mount write:   330 MB/s  
+Copy-up overhead:     99ms      
 ```
 
 **Analysis:** Good for Standard HDD. Copy-up is excellent.
@@ -54,8 +54,8 @@ Total (3 nginx): ~18 MB
 
 #### Security
 ```
-Privileged containers:    0 ✅
-Docker socket mounts:     0 ✅
+Privileged containers:    0 
+Docker socket mounts:     0 
 Default capabilities:     14
 ```
 
@@ -93,16 +93,16 @@ Default capabilities:     14
 ```
 Cold start (with pull):  568ms
 Warm start (cached):     183ms
-Average (10 runs):       196ms ✅
+Average (10 runs):       196ms 
 ```
 
 **Analysis:** 3x faster than Azure (Docker Desktop optimization).
 
 #### I/O Performance
 ```
-Sequential write:     3.4 GB/s  ✅
-Volume mount write:   2.2 GB/s  ✅
-Copy-up overhead:     120ms     ✅
+Sequential write:     3.4 GB/s  
+Volume mount write:   2.2 GB/s  
+Copy-up overhead:     120ms     
 ```
 
 **Analysis:** 10x faster than Azure (heavy caching, not production-like).

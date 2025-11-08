@@ -22,13 +22,13 @@ This repository contains:
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Docker Engine 20.10+ (tested on 28.0+)
 - **Tested Platforms:**
-  - ✅ **Ubuntu 22.04 (Azure VM)** - All 10 tests complete
-  - ✅ **macOS Docker Desktop 28.4.0** - 7/10 tests (expected)
+  -  **Ubuntu 22.04 (Azure VM)** - All 10 tests complete
+  -  **macOS Docker Desktop 28.4.0** - 7/10 tests (expected)
 - Linux or macOS with Docker
 - Root/sudo access for system inspection
 
@@ -61,19 +61,19 @@ sudo ./docker-analysis-toolkit.sh
 ## 📊 What the Toolkit Measures
 
 ### Performance Analysis
-- ✅ **Container startup latency** - Cold vs warm start times
-- ✅ **OverlayFS inspection** - Image layer structure
-- ✅ **I/O performance** - Write speed and copy-up overhead
-- ✅ **Network latency** - Bridge vs host mode
-- ✅ **Memory efficiency** - Page cache sharing
-- ✅ **CPU performance** - Throttling and cgroup limits
+-  **Container startup latency** - Cold vs warm start times
+-  **OverlayFS inspection** - Image layer structure
+-  **I/O performance** - Write speed and copy-up overhead
+-  **Network latency** - Bridge vs host mode
+-  **Memory efficiency** - Page cache sharing
+-  **CPU performance** - Throttling and cgroup limits
 
 ### Security Auditing
-- ✅ **Capability inspection** - Default and custom capabilities
-- ✅ **Privileged containers** - Dangerous configuration detection
-- ✅ **Docker socket exposure** - Root-equivalent access risks
-- ✅ **Namespace isolation** - PID, network, mount verification
-- ✅ **Resource limits** - Memory and CPU constraint validation
+-  **Capability inspection** - Default and custom capabilities
+-  **Privileged containers** - Dangerous configuration detection
+-  **Docker socket exposure** - Root-equivalent access risks
+-  **Namespace isolation** - PID, network, mount verification
+-  **Resource limits** - Memory and CPU constraint validation
 
 ---
 

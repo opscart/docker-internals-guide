@@ -266,9 +266,3 @@ We need baselines from:
 **Last Updated:** November 2025  
 **Data Points:** 2 platforms, 20 metrics each  
 **Total Tests Run:** 16 (9 Linux + 7 macOS)
-EOF
-
-# Commit the simplified versions:
-git add README.md benchmark-results.md
-git commit -m "docs: Simplify README, keep benchmark-results for detailed data"
-git push

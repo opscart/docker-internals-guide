@@ -1,0 +1,211 @@
+╔════════════════════════════════════════════════════════════╗
+║   Docker Performance & Security Analysis Toolkit           ║
+║   Deep-dive companion for container optimization           ║
+╚════════════════════════════════════════════════════════════╝
+
+
+========================================
+Checking Prerequisites
+========================================
+
+✓ docker found: Docker version 28.4.0, build d8eb465
+⚠ strace not found (optional for syscall tracing)
+⚠ perf not found (optional for CPU profiling)
+✓ jq found
+⚠ bpftrace not found (optional for eBPF tracing)
+
+========================================
+Test 1: Container Startup Latency
+========================================
+
+Measuring cold start time (no cached layers)...
+Untagged: alpine:latest
+Deleted: sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
+Unable to find image 'alpine:latest' locally
+latest: Pulling from library/alpine
+Digest: sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
+Status: Downloaded newer image for alpine:latest
+Cold start (with pull): 930ms
+
+Measuring warm start time (cached layers)...
+Warm start (cached): 224ms
+
+Running 10 iterations to get average...
+Average startup time: 197ms
+⚠ Acceptable startup performance (150-300ms)
+
+========================================
+Test 2: Syscall Analysis
+========================================
+
+⚠ strace not available, skipping
+
+========================================
+Test 3: OverlayFS Layer Analysis
+========================================
+
+Pulling multi-layer image (nginx)...
+
+Image layers:
+"sha256:0e64f2360a448b389c83fcbc3705e1364ccf43f004bb55233c689e7ce59a1ae9"
+"sha256:9aa3e1fc9021d6950f97e7c77997545de72cec50986d58023ae5d7efde742a53"
+"sha256:e664822438ac1f04749cb4c0d63f24bdd3b1da8748758c8a8282b96977ed5b30"
+"sha256:08ea284afe803e895a8704741e57efba853ff3a87435cb1edc6168a8e30a896f"
+"sha256:930a90aa29edafaebfe4a822ddd186ebb2540aa2fb8494442844124b5a1146ba"
+"sha256:b0fad68f6a9c2ce00d91fdb387cd83eb0a495ce6237ffcebb6b40085e3b16204"
+"sha256:a199459134dc2ad3dfda45b0b55cd1cdbc04e78b63ccbbf4a54912283828b61f"
+"sha256:4c37c07961d9341e24dc628450382ead009f4bb94dc441aa330c85c22adb52a0"
+
+Physical layer storage:
+Image ID: b3c656d55d7ad751196f21b7fd2e8d4da9cb430e32f646adcf92441b72f82b14
+⚠ /var/lib/docker/overlay2 not accessible (may require root)
+
+========================================
+Test 4: I/O Performance Analysis
+========================================
+
+Testing sequential write performance...
+104857600 bytes (100.0MB) copied, 0.051113 seconds, 1.9GB/s
+
+Testing with volume mount (should be faster)...
+104857600 bytes (100.0MB) copied, 0.047601 seconds, 2.1GB/s
+
+Testing copy-up overhead...
+Creating container with large file...
+Modifying file (triggers copy-up)...
+Copy-up operation time: 100ms
+
+========================================
+Test 5: Network Performance
+========================================
+
+Testing bridge network latency...
+10 packets transmitted, 10 packets received, 0% packet loss
+
+Testing host network latency (for comparison)...
+10 packets transmitted, 10 packets received, 0% packet loss
+
+Network overhead comparison:
+Bridge mode typically adds 0.1-0.3ms latency vs host mode
+
+========================================
+Test 6: Memory Efficiency & Page Cache Sharing
+========================================
+
+Starting 3 identical nginx containers...
+
+Individual container memory usage:
+NAME      MEM USAGE / LIMIT     MEM %
+nginx1    8.688MiB / 7.654GiB   0.11%
+nginx2    8.684MiB / 7.654GiB   0.11%
+nginx3    8.602MiB / 7.654GiB   0.11%
+
+Physical memory (RSS) per container:
+nginx1 (PID 16140): N/A KB
+nginx2 (PID 16217): N/A KB
+nginx3 (PID 16296): N/A KB
+
+Note: Shared pages (like nginx binary) are counted once in physical memory
+Total reported may exceed actual RAM usage due to page cache sharing
+
+========================================
+Test 7: Security Posture Analysis
+========================================
+
+Checking default container capabilities...
+CapInh:	0000000000000000
+CapPrm:	00000000a80425fb
+CapEff:	00000000a80425fb
+CapBnd:	00000000a80425fb
+CapAmb:	0000000000000000
+
+Capability names (requires libcap):
+Install libcap2-bin to decode capabilities
+
+Testing restricted container (no capabilities):
+CapInh:	0000000000000000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	0000000000000000
+CapAmb:	0000000000000000
+
+Checking for privileged containers (security risk):
+✓ No privileged containers running
+
+Checking Docker socket mounts (security risk):
+✓ No containers with Docker socket access
+
+========================================
+Test 8: CPU Performance & Throttling
+========================================
+
+Starting CPU-intensive container without limits...
+CPU usage:
+NAME       CPU %
+cpu-test   100.07%
+
+Starting CPU-limited container (50% of 1 core)...
+CPU usage (should be ~50%):
+NAME          CPU %
+cpu-limited   50.20%
+
+Checking for CPU throttling...
+
+========================================
+Test 9: Namespace Isolation Inspection
+========================================
+
+Starting test container...
+Container PID: 16741
+
+Namespace links for container process:
+Cannot access namespaces (requires root)
+
+Comparing to host namespaces:
+Host PID namespace:
+Requires root
+Container PID namespace:
+Requires root
+
+Container's view of processes (should only see itself):
+PID   USER     TIME  COMMAND
+    1 root      0:00 sleep 60
+    7 root      0:00 ps aux
+
+========================================
+Test 10: eBPF-based Syscall Tracing (Advanced)
+========================================
+
+⚠ bpftrace not available, skipping
+
+========================================
+Performance Analysis Summary
+========================================
+
+Docker daemon info:
+WARNING: Plugin "/Users/opscart/.docker/cli-plugins/docker-desktop" is not valid: failed to fetch metadata: exit status 1
+ Storage Driver: overlayfs
+ Kernel Version: 6.10.14-linuxkit
+ Operating System: Docker Desktop
+ CPUs: 10
+ Total Memory: 7.654GiB
+
+Analysis complete!
+
+Key findings:
+1. Check startup latency - should be <150ms for good performance
+2. OverlayFS copy-up operations add latency for large file modifications
+3. Use volumes for write-heavy workloads to bypass storage driver
+4. Host networking reduces latency by ~0.2ms but sacrifices isolation
+5. Page cache sharing makes multiple identical containers memory-efficient
+6. Avoid privileged containers and Docker socket mounts in production
+
+Recommendations:
+• Use multi-stage builds to reduce image size
+• Minimize layer count (combine RUN commands)
+• Drop unnecessary capabilities (--cap-drop=ALL)
+• Set resource limits (--memory, --cpus) for production
+• Use read-only root filesystem where possible (--read-only)
+• Enable user namespace remapping for additional security
+
+All tests completed!

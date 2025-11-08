@@ -1,3 +1,4 @@
+
 ╔════════════════════════════════════════════════════════════╗
 ║   Docker Performance & Security Analysis Toolkit           ║
 ║   Deep-dive companion for container optimization           ║
@@ -25,13 +26,13 @@ Unable to find image 'alpine:latest' locally
 latest: Pulling from library/alpine
 Digest: sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
 Status: Downloaded newer image for alpine:latest
-Cold start (with pull): 930ms
+Cold start (with pull): 579ms
 
 Measuring warm start time (cached layers)...
-Warm start (cached): 224ms
+Warm start (cached): 187ms
 
 Running 10 iterations to get average...
-Average startup time: 197ms
+Average startup time: 190ms
 ⚠ Acceptable startup performance (150-300ms)
 
 ========================================
@@ -65,22 +66,22 @@ Test 4: I/O Performance Analysis
 ========================================
 
 Testing sequential write performance...
-104857600 bytes (100.0MB) copied, 0.051113 seconds, 1.9GB/s
+104857600 bytes (100.0MB) copied, 0.041203 seconds, 2.4GB/s
 
 Testing with volume mount (should be faster)...
-104857600 bytes (100.0MB) copied, 0.047601 seconds, 2.1GB/s
+104857600 bytes (100.0MB) copied, 0.051135 seconds, 1.9GB/s
 
 Testing copy-up overhead...
 Creating container with large file...
 Modifying file (triggers copy-up)...
-Copy-up operation time: 100ms
+Copy-up operation time: 86ms
 
 ========================================
 Test 5: Network Performance
 ========================================
 
 Testing bridge network latency...
-10 packets transmitted, 10 packets received, 0% packet loss
+10 packets transmitted, 9 packets received, 10% packet loss
 
 Testing host network latency (for comparison)...
 10 packets transmitted, 10 packets received, 0% packet loss
@@ -96,14 +97,14 @@ Starting 3 identical nginx containers...
 
 Individual container memory usage:
 NAME      MEM USAGE / LIMIT     MEM %
-nginx1    8.688MiB / 7.654GiB   0.11%
-nginx2    8.684MiB / 7.654GiB   0.11%
-nginx3    8.602MiB / 7.654GiB   0.11%
+nginx1    8.602MiB / 7.654GiB   0.11%
+nginx2    8.598MiB / 7.654GiB   0.11%
+nginx3    8.652MiB / 7.654GiB   0.11%
 
 Physical memory (RSS) per container:
-nginx1 (PID 16140): N/A KB
-nginx2 (PID 16217): N/A KB
-nginx3 (PID 16296): N/A KB
+nginx1 (PID 19858): N/A KB
+nginx2 (PID 19936): N/A KB
+nginx3 (PID 20014): N/A KB
 
 Note: Shared pages (like nginx binary) are counted once in physical memory
 Total reported may exceed actual RAM usage due to page cache sharing
@@ -142,12 +143,12 @@ Test 8: CPU Performance & Throttling
 Starting CPU-intensive container without limits...
 CPU usage:
 NAME       CPU %
-cpu-test   100.07%
+cpu-test   99.86%
 
 Starting CPU-limited container (50% of 1 core)...
 CPU usage (should be ~50%):
 NAME          CPU %
-cpu-limited   50.20%
+cpu-limited   50.13%
 
 Checking for CPU throttling...
 
@@ -156,7 +157,7 @@ Test 9: Namespace Isolation Inspection
 ========================================
 
 Starting test container...
-Container PID: 16741
+Container PID: 20454
 
 Namespace links for container process:
 Cannot access namespaces (requires root)

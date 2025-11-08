@@ -274,7 +274,8 @@ test_security_posture() {
     
     echo -e "\nCapability names (requires libcap):"
     if command -v capsh &> /dev/null; then
-        docker run --rm alpine sh -c 'cat /proc/self/status | grep CapEff' | awk '{print $2}' | xargs capsh --decode
+        CAP_HEX=$(docker run --rm alpine sh -c 'cat /proc/self/status | grep CapEff' | awk '{print $2}')
+        capsh --decode=$CAP_HEX 2>/dev/null || echo "Install libcap2-bin to decode capabilities"
     else
         echo "Install libcap2-bin to decode capabilities"
     fi

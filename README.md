@@ -25,10 +25,12 @@ This repository contains:
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Docker Engine 20.10+ (tested on 28.0)
-- Linux or macOS with Docker (some tests require Linux)
+- Docker Engine 20.10+ (tested on 28.0+)
+- **Tested Platforms:**
+  - ✅ **Ubuntu 22.04 (Azure VM)** - All 10 tests complete
+  - ✅ **macOS Docker Desktop 28.4.0** - 7/10 tests (expected)
+- Linux or macOS with Docker
 - Root/sudo access for system inspection
-- Basic command line familiarity
 
 ### Run the Full Analysis Suite
 
@@ -39,8 +41,21 @@ chmod +x docker-analysis-toolkit.sh
 sudo ./docker-analysis-toolkit.sh
 ```
 
-**Output:** Comprehensive report covering startup latency, I/O performance, security posture, and resource utilization.
+**Output:** Comprehensive report covering all 10 tests including:
+- Container startup latency (cold/warm)
+- Syscall tracing with strace
+- OverlayFS layer inspection
+- I/O performance and copy-up overhead
+- Network performance analysis
+- Memory efficiency and page cache sharing
+- Security posture audit
+- CPU throttling verification
+- Namespace isolation inspection
+- eBPF-based syscall tracing (optional)
 
+**Platform Results:**
+- Linux: All 10 tests execute (see [examples](toolkit/examples/))
+- macOS: 7/10 tests (strace, eBPF not available - expected)
 ---
 
 ## 📊 What the Toolkit Measures

@@ -20,13 +20,16 @@ Test 1: Container Startup Latency
 ========================================
 
 Measuring cold start time (no cached layers)...
-Cold start (with pull): 1742ms
+Untagged: alpine:latest
+Untagged: alpine@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412
+Deleted: sha256:706db57fb2063f39f69632c5b5c9c439633fda35110e65587c5d85553fd1cc38
+Cold start (with pull): 993ms
 
 Measuring warm start time (cached layers)...
-Warm start (cached): 655ms
+Warm start (cached): 661ms
 
 Running 10 iterations to get average...
-Average startup time: 629ms
+Average startup time: 628ms
 ✗ Slow startup performance (>300ms) - check storage driver
 
 ========================================
@@ -91,15 +94,15 @@ Test 4: I/O Performance Analysis
 ========================================
 
 Testing sequential write performance...
-104857600 bytes (100.0MB) copied, 0.305759 seconds, 327.1MB/s
+104857600 bytes (100.0MB) copied, 0.297471 seconds, 336.2MB/s
 
 Testing with volume mount (should be faster)...
-104857600 bytes (100.0MB) copied, 0.303374 seconds, 329.6MB/s
+104857600 bytes (100.0MB) copied, 0.325340 seconds, 307.4MB/s
 
 Testing copy-up overhead...
 Creating container with large file...
 Modifying file (triggers copy-up)...
-Copy-up operation time: 99ms
+Copy-up operation time: 96ms
 
 ========================================
 Test 5: Network Performance
@@ -122,14 +125,14 @@ Starting 3 identical nginx containers...
 
 Individual container memory usage:
 NAME      MEM USAGE / LIMIT     MEM %
-nginx1    2.605MiB / 3.285GiB   0.08%
-nginx2    2.559MiB / 3.285GiB   0.08%
-nginx3    2.57MiB / 3.285GiB    0.08%
+nginx1    2.57MiB / 3.285GiB    0.08%
+nginx2    2.574MiB / 3.285GiB   0.08%
+nginx3    2.566MiB / 3.285GiB   0.08%
 
 Physical memory (RSS) per container:
-nginx1 (PID 6399):  6016 KB
-nginx2 (PID 6483):  6016 KB
-nginx3 (PID 6568):  6016 KB
+nginx1 (PID 16623):  6016 KB
+nginx2 (PID 16709):  5888 KB
+nginx3 (PID 16795):  6144 KB
 
 Note: Shared pages (like nginx binary) are counted once in physical memory
 Total reported may exceed actual RAM usage due to page cache sharing
@@ -146,39 +149,101 @@ CapBnd:	00000000a80425fb
 CapAmb:	0000000000000000
 
 Capability names (requires libcap):
-usage: capsh [args ...]
-  --help         this message (or try 'man capsh')
-  --print        display capability relevant state
-  --decode=xxx   decode a hex string to a list of caps
-  --supports=xxx exit 1 if capability xxx unsupported
-  --has-p=xxx    exit 1 if capability xxx not permitted
-  --has-i=xxx    exit 1 if capability xxx not inheritable
-  --drop=xxx     remove xxx,.. capabilities from bset
-  --dropped=xxx  exit 1 unless bounding cap xxx dropped
-  --has-ambient  exit 1 unless ambient vector supported
-  --has-a=xxx    exit 1 if capability xxx not ambient
-  --addamb=xxx   add xxx,... capabilities to ambient set
-  --delamb=xxx   remove xxx,... capabilities from ambient
-  --noamb        reset (drop) all ambient capabilities
-  --caps=xxx     set caps as per cap_from_text()
-  --inh=xxx      set xxx,.. inheritable set
-  --secbits=<n>  write a new value for securebits
-  --iab=...      use cap_iab_from_text() to set iab
-  --keep=<n>     set keep-capability bit to <n>
-  --uid=<n>      set uid to <n> (hint: id <username>)
-  --cap-uid=<n>  libcap cap_setuid() to change uid
-  --is-uid=<n>   exit 1 if uid != <n>
-  --gid=<n>      set gid to <n> (hint: id <username>)
-  --is-gid=<n>   exit 1 if gid != <n>
-  --groups=g,... set the supplemental groups
-  --user=<name>  set uid,gid and groups to that of user
-  --chroot=path  chroot(2) to this path
-  --modes        list libcap named capability modes
-  --mode=<xxx>   set capability mode to <xxx>
-  --inmode=<xxx> exit 1 if current mode is not <xxx>
-  --killit=<n>   send signal(n) to child
-  --forkfor=<n>  fork and make child sleep for <n> sec
-  --shell=/xx/yy use /xx/yy instead of /bin/bash for --
-  ==             re-exec(capsh) with args as for --
-  --             remaining arguments are for /bin/bash
-                 (without -- [capsh] will simply exit(0))
+0x00000000a80425fb=cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap
+
+Testing restricted container (no capabilities):
+CapInh:	0000000000000000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	0000000000000000
+CapAmb:	0000000000000000
+
+Checking for privileged containers (security risk):
+✓ No privileged containers running
+
+Checking Docker socket mounts (security risk):
+✓ No containers with Docker socket access
+
+========================================
+Test 8: CPU Performance & Throttling
+========================================
+
+Starting CPU-intensive container without limits...
+CPU usage:
+NAME       CPU %
+cpu-test   99.38%
+
+Starting CPU-limited container (50% of 1 core)...
+CPU usage (should be ~50%):
+NAME          CPU %
+cpu-limited   50.90%
+
+Checking for CPU throttling...
+
+========================================
+Test 9: Namespace Isolation Inspection
+========================================
+
+Starting test container...
+Container PID: 17584
+
+Namespace links for container process:
+total 0
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 cgroup -> cgroup:[4026532180]
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 ipc -> ipc:[4026532178]
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 mnt -> mnt:[4026532176]
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 net -> net:[4026532181]
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 pid -> pid:[4026532179]
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 pid_for_children -> pid:[4026532179]
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 time -> time:[4026531834]
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 time_for_children -> time:[4026531834]
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 user -> user:[4026531837]
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 uts -> uts:[4026532177]
+
+Comparing to host namespaces:
+Host PID namespace:
+lrwxrwxrwx 1 root root 0 Nov  8 15:48 /proc/1/ns/pid -> pid:[4026531836]
+Container PID namespace:
+lrwxrwxrwx 1 root root 0 Nov  8 16:24 /proc/17584/ns/pid -> pid:[4026532179]
+
+Container's view of processes (should only see itself):
+PID   USER     TIME  COMMAND
+    1 root      0:00 sleep 60
+    6 root      0:00 ps aux
+
+========================================
+Test 10: eBPF-based Syscall Tracing (Advanced)
+========================================
+
+⚠ bpftrace not available, skipping
+
+========================================
+Performance Analysis Summary
+========================================
+
+Docker daemon info:
+ Storage Driver: overlay2
+ Kernel Version: 6.8.0-1041-azure
+ Operating System: Ubuntu 22.04.5 LTS
+ CPUs: 1
+ Total Memory: 3.285GiB
+
+Analysis complete!
+
+Key findings:
+1. Check startup latency - should be <150ms for good performance
+2. OverlayFS copy-up operations add latency for large file modifications
+3. Use volumes for write-heavy workloads to bypass storage driver
+4. Host networking reduces latency by ~0.2ms but sacrifices isolation
+5. Page cache sharing makes multiple identical containers memory-efficient
+6. Avoid privileged containers and Docker socket mounts in production
+
+Recommendations:
+• Use multi-stage builds to reduce image size
+• Minimize layer count (combine RUN commands)
+• Drop unnecessary capabilities (--cap-drop=ALL)
+• Set resource limits (--memory, --cpus) for production
+• Use read-only root filesystem where possible (--read-only)
+• Enable user namespace remapping for additional security
+
+All tests completed!

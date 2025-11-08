@@ -1,0 +1,184 @@
+
+╔════════════════════════════════════════════════════════════╗
+║   Docker Performance & Security Analysis Toolkit           ║
+║   Deep-dive companion for container optimization           ║
+╚════════════════════════════════════════════════════════════╝
+
+
+========================================
+Checking Prerequisites
+========================================
+
+✓ docker found: Docker version 28.2.2, build 28.2.2-0ubuntu1~22.04.1
+✓ strace found
+✓ perf found
+✓ jq found
+⚠ bpftrace not found (optional for eBPF tracing)
+
+========================================
+Test 1: Container Startup Latency
+========================================
+
+Measuring cold start time (no cached layers)...
+Cold start (with pull): 1742ms
+
+Measuring warm start time (cached layers)...
+Warm start (cached): 655ms
+
+Running 10 iterations to get average...
+Average startup time: 629ms
+✗ Slow startup performance (>300ms) - check storage driver
+
+========================================
+Test 2: Syscall Analysis
+========================================
+
+Tracing syscalls for container creation...
+(This will show namespace creation, mounts, etc.)
+syscall traced
+
+Key syscalls detected:
+  clone() calls (process creation): 0
+0
+  unshare() calls (namespace creation): 0
+0
+  mount() calls (filesystem setup): 0
+0
+  setns() calls (namespace switching): 0
+0
+  execve() calls (program execution): 1
+
+First few clone() syscalls with namespace flags:
+No clone calls found
+
+Full trace saved to: /tmp/docker-syscall-trace.log
+
+========================================
+Test 3: OverlayFS Layer Analysis
+========================================
+
+Pulling multi-layer image (nginx)...
+
+Image layers:
+"sha256:256f393e029fa2063d8c93720da36a74a032bed3355a2bc3e313ad12f8bde9d1"
+"sha256:50b58ca2a3f5df327f34b26a67bcf09e84bd922972d651ed30939fc7378f8acc"
+"sha256:2660a7d4b906e8971834a94fe42c4308aa83aec0f7a1d590f21cab4ac85ab303"
+"sha256:2c79d5d895bb2e6ac5cbfc4eaf09318c655d5713d2629542e29d0564a5dc84f8"
+"sha256:b74d92be8225184e9cce1d356d9852b23fd4593ac2bc2b1e2e843dac819758ca"
+"sha256:3297b9628ff3624c5cec418fce70b84e81cee2d50beec077b58fb6daf478df56"
+"sha256:99ea4bde418df15b6e7a8b9e4aed69b3b46a7176e7dcd26ee8f715cf0f29a4a2"
+"sha256:25906c27b84d62cffa22785bff6e5f2d29499313c43b8a4985890528ac72c7ac"
+
+Physical layer storage:
+Image ID: d4918ca78576a537caa7b0c043051c8efc1796de33fee8724ee0fff4a1cabed9
+
+Layer directories in /var/lib/docker/overlay2/:
+/var/lib/docker/overlay2
+/var/lib/docker/overlay2/8214917567f1322b2be74240e275315df7f5b59366332ecf3b9d9569d074cb88
+/var/lib/docker/overlay2/f0a82cfc7ee7876afab92890f3b34fd388b57f90f4ba38a5bc1fd73766c7bf8a
+/var/lib/docker/overlay2/bc477b6d27d0b710cb1dc35a71a856aeeffb87715f4934eee91d566d13e7a7a9
+/var/lib/docker/overlay2/dbfc8640d4fde5a87c9988a5f5566c7ca73ae0dd62b6bed00aa1012edba4a000
+/var/lib/docker/overlay2/b407c9717a3d256327e9839ae8be5bfc4e47237c922cc7dc4067020576237ce0
+/var/lib/docker/overlay2/da420ba7068638997941febdaf5f5c45acc7c38b70d01a15c962de902bb50bd2
+/var/lib/docker/overlay2/d97c5c0bf06de13403f6719dc24a5dfdf9253d987efff8beaa52f95ec64d4771
+/var/lib/docker/overlay2/be431821d5765086bd8f9be935224bfaf6f9bce5ebbc909025bdb24afe21e2cb
+/var/lib/docker/overlay2/l
+
+Example layer structure:
+
+========================================
+Test 4: I/O Performance Analysis
+========================================
+
+Testing sequential write performance...
+104857600 bytes (100.0MB) copied, 0.305759 seconds, 327.1MB/s
+
+Testing with volume mount (should be faster)...
+104857600 bytes (100.0MB) copied, 0.303374 seconds, 329.6MB/s
+
+Testing copy-up overhead...
+Creating container with large file...
+Modifying file (triggers copy-up)...
+Copy-up operation time: 99ms
+
+========================================
+Test 5: Network Performance
+========================================
+
+Testing bridge network latency...
+10 packets transmitted, 10 packets received, 0% packet loss
+
+Testing host network latency (for comparison)...
+10 packets transmitted, 10 packets received, 0% packet loss
+
+Network overhead comparison:
+Bridge mode typically adds 0.1-0.3ms latency vs host mode
+
+========================================
+Test 6: Memory Efficiency & Page Cache Sharing
+========================================
+
+Starting 3 identical nginx containers...
+
+Individual container memory usage:
+NAME      MEM USAGE / LIMIT     MEM %
+nginx1    2.605MiB / 3.285GiB   0.08%
+nginx2    2.559MiB / 3.285GiB   0.08%
+nginx3    2.57MiB / 3.285GiB    0.08%
+
+Physical memory (RSS) per container:
+nginx1 (PID 6399):  6016 KB
+nginx2 (PID 6483):  6016 KB
+nginx3 (PID 6568):  6016 KB
+
+Note: Shared pages (like nginx binary) are counted once in physical memory
+Total reported may exceed actual RAM usage due to page cache sharing
+
+========================================
+Test 7: Security Posture Analysis
+========================================
+
+Checking default container capabilities...
+CapInh:	0000000000000000
+CapPrm:	00000000a80425fb
+CapEff:	00000000a80425fb
+CapBnd:	00000000a80425fb
+CapAmb:	0000000000000000
+
+Capability names (requires libcap):
+usage: capsh [args ...]
+  --help         this message (or try 'man capsh')
+  --print        display capability relevant state
+  --decode=xxx   decode a hex string to a list of caps
+  --supports=xxx exit 1 if capability xxx unsupported
+  --has-p=xxx    exit 1 if capability xxx not permitted
+  --has-i=xxx    exit 1 if capability xxx not inheritable
+  --drop=xxx     remove xxx,.. capabilities from bset
+  --dropped=xxx  exit 1 unless bounding cap xxx dropped
+  --has-ambient  exit 1 unless ambient vector supported
+  --has-a=xxx    exit 1 if capability xxx not ambient
+  --addamb=xxx   add xxx,... capabilities to ambient set
+  --delamb=xxx   remove xxx,... capabilities from ambient
+  --noamb        reset (drop) all ambient capabilities
+  --caps=xxx     set caps as per cap_from_text()
+  --inh=xxx      set xxx,.. inheritable set
+  --secbits=<n>  write a new value for securebits
+  --iab=...      use cap_iab_from_text() to set iab
+  --keep=<n>     set keep-capability bit to <n>
+  --uid=<n>      set uid to <n> (hint: id <username>)
+  --cap-uid=<n>  libcap cap_setuid() to change uid
+  --is-uid=<n>   exit 1 if uid != <n>
+  --gid=<n>      set gid to <n> (hint: id <username>)
+  --is-gid=<n>   exit 1 if gid != <n>
+  --groups=g,... set the supplemental groups
+  --user=<name>  set uid,gid and groups to that of user
+  --chroot=path  chroot(2) to this path
+  --modes        list libcap named capability modes
+  --mode=<xxx>   set capability mode to <xxx>
+  --inmode=<xxx> exit 1 if current mode is not <xxx>
+  --killit=<n>   send signal(n) to child
+  --forkfor=<n>  fork and make child sleep for <n> sec
+  --shell=/xx/yy use /xx/yy instead of /bin/bash for --
+  ==             re-exec(capsh) with args as for --
+  --             remaining arguments are for /bin/bash
+                 (without -- [capsh] will simply exit(0))

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      /* CNCF Color Palette */
+      .layer-box { stroke: #2E4057; stroke-width: 3; }
+      .layer-primary { fill: #436B95; }      /* CNCF Blue - Primary layers */
+      .layer-secondary { fill: #5B8DB8; }    /* Lighter blue - Secondary layers */
+      .layer-tertiary { fill: #76A5C6; }     /* Even lighter blue */
+      .layer-kernel { fill: #4D5B6C; }       /* Dark gray for kernel */
+      .layer-hardware { fill: #6C7A89; }     /* Medium gray for hardware */
+      
+      .layer-text { fill: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif; font-size: 22px; font-weight: bold; }
+      .layer-desc { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 17px; }
+      .arrow { stroke: #5B8DB8; stroke-width: 4; fill: none; marker-end: url(#arrowhead); }
+      .title { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 36px; font-weight: bold; }
+      .latency { fill: #F26722; font-family: 'Segoe UI', Arial, sans-serif; font-size: 18px; font-weight: 600; }
+      .annotation { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 16px; font-weight: 600; }
+    </style>
+    <marker id="arrowhead" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto">
+      <polygon points="0 0, 12 4, 0 8" fill="#5B8DB8" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="600" y="50" text-anchor="middle" class="title">Docker's 7-Layer Architecture</text>
+  
+  <!-- Layer 1: Docker CLI -->
+  <rect x="80" y="100" width="1040" height="100" rx="8" class="layer-box layer-primary"/>
+  <text x="600" y="140" text-anchor="middle" class="layer-text">1. Docker CLI (docker command)</text>
+  <text x="600" y="170" text-anchor="middle" class="layer-desc" style="fill: #E8EEF2;">User interface - parses commands, sends REST API calls</text>
+  <text x="1080" y="150" text-anchor="end" class="latency">~5ms</text>
+  
+  <!-- Arrow -->
+  <path d="M 600 200 L 600 240" class="arrow"/>
+  
+  <!-- Layer 2: Docker Daemon -->
+  <rect x="80" y="245" width="1040" height="100" rx="8" class="layer-box layer-primary"/>
+  <text x="600" y="285" text-anchor="middle" class="layer-text">2. Docker Daemon (dockerd)</text>
+  <text x="600" y="315" text-anchor="middle" class="layer-desc" style="fill: #E8EEF2;">REST API server - manages images, networks, volumes</text>
+  <text x="1080" y="295" text-anchor="end" class="latency">~10ms</text>
+  
+  <!-- Arrow -->
+  <path d="M 600 345 L 600 385" class="arrow"/>
+  
+  <!-- Layer 3: containerd -->
+  <rect x="80" y="390" width="1040" height="100" rx="8" class="layer-box layer-secondary"/>
+  <text x="600" y="430" text-anchor="middle" class="layer-text">3. containerd (High-level Runtime)</text>
+  <text x="600" y="460" text-anchor="middle" class="layer-desc" style="fill: #FFFFFF;">Container lifecycle management - image pull, storage, execution</text>
+  <text x="1080" y="440" text-anchor="end" class="latency">~20ms</text>
+  
+  <!-- Arrow -->
+  <path d="M 600 490 L 600 530" class="arrow"/>
+  
+  <!-- Layer 4: containerd-shim -->
+  <rect x="80" y="535" width="1040" height="100" rx="8" class="layer-box layer-secondary"/>
+  <text x="600" y="575" text-anchor="middle" class="layer-text">4. containerd-shim (Process Manager)</text>
+  <text x="600" y="605" text-anchor="middle" class="layer-desc" style="fill: #FFFFFF;">Daemonless containers - keeps STDIO open, reports exit status</text>
+  <text x="1080" y="585" text-anchor="end" class="latency">~5ms</text>
+  
+  <!-- Arrow -->
+  <path d="M 600 635 L 600 675" class="arrow"/>
+  
+  <!-- Layer 5: runc -->
+  <rect x="80" y="680" width="1040" height="100" rx="8" class="layer-box layer-tertiary"/>
+  <text x="600" y="720" text-anchor="middle" class="layer-text">5. runc (OCI Runtime)</text>
+  <text x="600" y="750" text-anchor="middle" class="layer-desc" style="fill: #2E4057;">Creates namespaces, cgroups - executes container process</text>
+  <text x="1080" y="730" text-anchor="end" class="latency">~50ms</text>
+  
+  <!-- Arrows to Layer 6 & 7 -->
+  <path d="M 350 780 L 350 815" class="arrow"/>
+  <path d="M 850 780 L 850 815" class="arrow"/>
+  
+  <!-- Layer 6 & 7: Kernel and Hardware (side by side) -->
+  <rect x="80" y="820" width="500" height="60" rx="8" class="layer-box layer-kernel"/>
+  <text x="330" y="860" text-anchor="middle" class="layer-text" style="font-size: 20px;">6. Linux Kernel</text>
+  
+  <rect x="620" y="820" width="500" height="60" rx="8" class="layer-box layer-hardware"/>
+  <text x="870" y="860" text-anchor="middle" class="layer-text" style="font-size: 20px;">7. Hardware (CPU, Memory, I/O)</text>
+  
+  <!-- Key syscalls annotation -->
+  <text x="80" y="910" class="annotation">Key syscalls: clone() → unshare() → mount() → setns() → execve()</text>
+  <text x="80" y="935" class="layer-desc">Total typical startup: ~150ms (cached) to 600ms+ (cold start with pull)</text>
+  
+  <!-- Data Sources Citation -->
+  <text x="600" y="970" text-anchor="middle" class="layer-desc" style="font-size: 14px; font-style: italic; fill: #6C7A89;">
+    Data sources: Docker analysis toolkit syscall traces, OCI Runtime Specification, containerd architecture documentation
+  </text>
+</svg>

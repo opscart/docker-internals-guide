@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1300" height="850" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      /* CNCF Color Palette */
+      .title { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 32px; font-weight: bold; }
+      .subtitle { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 18px; }
+      .section-title { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 24px; font-weight: bold; }
+      
+      .layer-box { stroke: #2E4057; stroke-width: 3; }
+      .lower-layer { fill: #D4E4F7; }       /* Light blue for read-only */
+      .upper-layer { fill: #FFE8CC; }       /* Light orange for writable */
+      .merged-layer { fill: #D4F1D4; }      /* Light green for merged view */
+      .file-box { fill: #FFFFFF; stroke: #2E4057; stroke-width: 2; }
+      
+      .label { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 16px; }
+      .label-bold { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 18px; font-weight: bold; }
+      .arrow { stroke: #5B8DB8; stroke-width: 4; fill: none; marker-end: url(#arrowhead-blue); }
+      .arrow-slow { stroke: #436B95; stroke-width: 5; fill: none; marker-end: url(#arrowhead-dark); stroke-dasharray: 8,4; }
+      .perf-good { fill: #5B8DB8; font-family: 'Segoe UI', Arial, sans-serif; font-size: 16px; font-weight: bold; }
+      .perf-bad { fill: #F26722; font-family: 'Segoe UI', Arial, sans-serif; font-size: 16px; font-weight: bold; }
+      .code { fill: #2E4057; font-family: 'Courier New', monospace; font-size: 15px; }
+      .annotation { fill: #436B95; font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; font-weight: 600; }
+    </style>
+    <marker id="arrowhead-blue" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#5B8DB8" />
+    </marker>
+    <marker id="arrowhead-dark" markerWidth="9" markerHeight="9" refX="8" refY="3.5" orient="auto">
+      <polygon points="0 0, 9 3.5, 0 7" fill="#436B95" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="650" y="45" text-anchor="middle" class="title">OverlayFS: Copy-up Performance Impact</text>
+  <text x="650" y="75" text-anchor="middle" class="subtitle">Why modifying image files is expensive</text>
+  
+  <!-- ========== LEFT SIDE: READ PATH (FAST) ========== -->
+  <text x="290" y="125" text-anchor="middle" class="section-title" style="fill: #5B8DB8;">READ Path (Fast)</text>
+  
+  <!-- Container View -->
+  <rect x="80" y="150" width="420" height="85" rx="8" class="layer-box merged-layer"/>
+  <text x="290" y="185" text-anchor="middle" class="label-bold">Container's View (Merged)</text>
+  <text x="290" y="213" text-anchor="middle" class="code">/app/config.json (appears here)</text>
+  
+  <!-- Arrow down -->
+  <path d="M 290 235 L 290 300" class="arrow"/>
+  <text x="320" y="275" class="annotation">Direct read</text>
+  
+  <!-- Lower Layer -->
+  <rect x="80" y="305" width="420" height="140" rx="8" class="layer-box lower-layer"/>
+  <text x="290" y="340" text-anchor="middle" class="label-bold">Lower Layer (Image - Read-Only)</text>
+  <rect x="110" y="360" width="170" height="60" rx="5" class="file-box"/>
+  <text x="195" y="385" text-anchor="middle" class="code">config.json</text>
+  <text x="195" y="408" text-anchor="middle" class="label">50 MB</text>
+  <rect x="310" y="360" width="170" height="60" rx="5" class="file-box"/>
+  <text x="395" y="385" text-anchor="middle" class="code">app.py</text>
+  <text x="395" y="408" text-anchor="middle" class="label">10 KB</text>
+  
+  <!-- Upper Layer (empty) -->
+  <rect x="80" y="510" width="420" height="85" rx="8" class="layer-box upper-layer"/>
+  <text x="290" y="545" text-anchor="middle" class="label-bold">Upper Layer (Container - Writable)</text>
+  <text x="290" y="573" text-anchor="middle" class="label" style="font-style: italic;">Empty - no copy needed</text>
+  
+  <!-- Performance annotation -->
+  <text x="290" y="630" text-anchor="middle" class="perf-good">✓ FAST: ~0.1ms - Direct read from lower layer</text>
+  
+  
+  <!-- ========== RIGHT SIDE: WRITE PATH (SLOW) ========== -->
+  <text x="940" y="125" text-anchor="middle" class="section-title" style="fill: #F26722;">WRITE Path (Slow - Copy-up)</text>
+  
+  <!-- Container View -->
+  <rect x="730" y="150" width="420" height="85" rx="8" class="layer-box merged-layer"/>
+  <text x="940" y="185" text-anchor="middle" class="label-bold">Container's View (Merged)</text>
+  <text x="940" y="213" text-anchor="middle" class="code">echo "new" >> /app/config.json</text>
+  
+  <!-- Arrow to lower (step 1) -->
+  <path d="M 940 235 L 940 300" class="arrow"/>
+  <text x="990" y="275" class="annotation">1. Locate file</text>
+  
+  <!-- Lower Layer -->
+  <rect x="730" y="305" width="420" height="140" rx="8" class="layer-box lower-layer"/>
+  <text x="940" y="340" text-anchor="middle" class="label-bold">Lower Layer (Image - Read-Only)</text>
+  <rect x="760" y="360" width="170" height="60" rx="5" class="file-box" style="stroke: #F26722; stroke-width: 3;"/>
+  <text x="845" y="385" text-anchor="middle" class="code">config.json</text>
+  <text x="845" y="408" text-anchor="middle" class="label">50 MB</text>
+  <rect x="960" y="360" width="170" height="60" rx="5" class="file-box"/>
+  <text x="1045" y="385" text-anchor="middle" class="code">app.py</text>
+  <text x="1045" y="408" text-anchor="middle" class="label">10 KB</text>
+  
+  <!-- Arrow from lower to upper (copy operation) -->
+  <path d="M 845 420 L 845 510" class="arrow-slow"/>
+  <text x="880" y="465" class="annotation" style="fill: #F26722;">2. Copy entire</text>
+  <text x="880" y="483" class="annotation" style="fill: #F26722;">   50MB file</text>
+  
+  <!-- Upper Layer (with copy) -->
+  <rect x="730" y="510" width="420" height="110" rx="8" class="layer-box upper-layer"/>
+  <text x="940" y="545" text-anchor="middle" class="label-bold">Upper Layer (Container - Writable)</text>
+  <rect x="790" y="565" width="300" height="40" rx="5" class="file-box" style="fill: #FFE0B2;"/>
+  <text x="940" y="592" text-anchor="middle" class="code">config.json (copied + modified!)</text>
+  
+  <!-- Performance annotation -->
+  <text x="940" y="655" text-anchor="middle" class="perf-bad">✗ SLOW: 50-150ms for large files (96ms measured)</text>
+  
+  
+  <!-- ========== BOTTOM: BENCHMARK DATA ========== -->
+  <rect x="80" y="690" width="1140" height="140" rx="10" fill="#F7F9FA" stroke="#B0BEC5" stroke-width="3"/>
+  <text x="650" y="725" text-anchor="middle" class="section-title">Real Benchmark Data (Test 4 from Toolkit)</text>
+  
+  <!-- Left: Overlay Performance -->
+  <text x="110" y="760" class="label-bold" style="font-size: 18px;">OverlayFS (Default Docker):</text>
+  <text x="110" y="785" class="code" style="font-size: 14px;">Sequential write: 100MB copied in 0.297s → 336.2 MB/s</text>
+  <text x="110" y="808" class="perf-bad" style="font-size: 15px;">Copy-up test: 50MB file modification → 96ms penalty ⚠</text>
+  
+  <!-- Right: Volume Mount (Better) -->
+  <text x="680" y="760" class="label-bold" style="font-size: 18px;">Volume Mount (Recommended):</text>
+  <text x="680" y="785" class="code" style="font-size: 14px;">docker run -v /data:/data alpine</text>
+  <text x="680" y="808" class="perf-good" style="font-size: 15px;">✓ Bypasses overlay - no copy-up! Use for DBs, logs, write-heavy workloads</text>
+  
+  <!-- Data Sources Citation -->
+  <text x="650" y="845" text-anchor="middle" class="label" style="font-size: 13px; font-style: italic; fill: #6C7A89;">
+    Data source: Docker analysis toolkit Test 4 (I/O Performance Analysis) - sample-output-linux-azure.txt
+  </text>
+</svg>

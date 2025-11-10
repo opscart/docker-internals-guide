@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1400" height="700" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      /* CNCF Color Palette */
+      .title { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 28px; font-weight: bold; }
+      .subtitle { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 18px; }
+      .section-title { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 22px; font-weight: bold; }
+      
+      .container-box { fill: #5B8DB8; stroke: #436B95; stroke-width: 3; }
+      .microvm-box { fill: #76A5C6; stroke: #5B8DB8; stroke-width: 3; }
+      .vm-box { fill: #8FBDD3; stroke: #76A5C6; stroke-width: 3; }
+      .kernel-box { fill: #4D5B6C; stroke: #3A4551; stroke-width: 2; }
+      .hypervisor-box { fill: #6C7A89; stroke: #4D5B6C; stroke-width: 2; }
+      .hardware-box { fill: #959FAA; stroke: #6C7A89; stroke-width: 2; }
+      
+      .label { fill: #FFFFFF; font-family: 'Segoe UI', Arial, sans-serif; font-size: 16px; font-weight: bold; text-anchor: middle; }
+      .metric { fill: #2E4057; font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; }
+      .metric-value { fill: #436B95; font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; font-weight: bold; }
+      .warning { fill: #F26722; font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; font-weight: 600; }
+      .success { fill: #5B8DB8; font-family: 'Segoe UI', Arial, sans-serif; font-size: 14px; font-weight: 600; }
+    </style>
+  </defs>
+  
+  <!-- Title -->
+  <text x="700" y="40" text-anchor="middle" class="title">Container vs MicroVM vs Traditional VM</text>
+  <text x="700" y="70" text-anchor="middle" class="subtitle">Understanding Isolation Trade-offs</text>
+  
+  <!-- ========== DOCKER CONTAINERS ========== -->
+  <text x="230" y="115" text-anchor="middle" class="section-title">Docker Containers</text>
+  
+  <!-- Container 1 -->
+  <rect x="60" y="140" width="130" height="70" rx="5" class="container-box"/>
+  <text x="125" y="170" class="label">App 1</text>
+  <text x="125" y="195" class="label" style="font-size: 13px;">Namespace 1</text>
+  
+  <!-- Container 2 -->
+  <rect x="210" y="140" width="130" height="70" rx="5" class="container-box"/>
+  <text x="275" y="170" class="label">App 2</text>
+  <text x="275" y="195" class="label" style="font-size: 13px;">Namespace 2</text>
+  
+  <!-- Container 3 -->
+  <rect x="360" y="140" width="130" height="70" rx="5" class="container-box"/>
+  <text x="425" y="170" class="label">App 3</text>
+  <text x="425" y="195" class="label" style="font-size: 13px;">Namespace 3</text>
+  
+  <!-- Shared Kernel -->
+  <rect x="60" y="225" width="430" height="60" rx="5" class="kernel-box"/>
+  <text x="275" y="260" class="label">Shared Host Kernel (Single Point of Failure)</text>
+  
+  <!-- Hardware -->
+  <rect x="60" y="300" width="430" height="50" rx="5" class="hardware-box"/>
+  <text x="275" y="332" class="label">Hardware</text>
+  
+  <!-- Metrics -->
+  <text x="60" y="380" class="metric">Boot Time:</text>
+  <text x="145" y="380" class="metric-value">~150ms</text>
+  <text x="60" y="405" class="metric">Memory/Container:</text>
+  <text x="190" y="405" class="metric-value">1-2 MB</text>
+  <text x="60" y="430" class="metric">Isolation:</text>
+  <text x="130" y="430" class="metric-value">Namespace</text>
+  <text x="60" y="460" class="warning">⚠ Kernel exploit = all containers</text>
+  
+  <!-- ========== MICROVMS (Firecracker) ========== -->
+  <text x="725" y="115" text-anchor="middle" class="section-title">MicroVMs (Firecracker)</text>
+  
+  <!-- MicroVM 1 -->
+  <g>
+    <rect x="555" y="140" width="130" height="70" rx="5" class="microvm-box"/>
+    <text x="620" y="170" class="label">App 1</text>
+    <rect x="555" y="215" width="130" height="35" rx="4" class="kernel-box"/>
+    <text x="620" y="238" class="label" style="font-size: 13px;">Guest Kernel</text>
+  </g>
+  
+  <!-- MicroVM 2 -->
+  <g>
+    <rect x="705" y="140" width="130" height="70" rx="5" class="microvm-box"/>
+    <text x="770" y="170" class="label">App 2</text>
+    <rect x="705" y="215" width="130" height="35" rx="4" class="kernel-box"/>
+    <text x="770" y="238" class="label" style="font-size: 13px;">Guest Kernel</text>
+  </g>
+  
+  <!-- MicroVM 3 -->
+  <g>
+    <rect x="855" y="140" width="130" height="70" rx="5" class="microvm-box"/>
+    <text x="920" y="170" class="label">App 3</text>
+    <rect x="855" y="215" width="130" height="35" rx="4" class="kernel-box"/>
+    <text x="920" y="238" class="label" style="font-size: 13px;">Guest Kernel</text>
+  </g>
+  
+  <!-- Hypervisor (KVM) -->
+  <rect x="555" y="265" width="430" height="50" rx="5" class="hypervisor-box"/>
+  <text x="770" y="296" class="label">Hypervisor (KVM) - Minimal Device Model</text>
+  
+  <!-- Hardware -->
+  <rect x="555" y="330" width="430" height="50" rx="5" class="hardware-box"/>
+  <text x="770" y="362" class="label">Hardware</text>
+  
+  <!-- Metrics -->
+  <text x="555" y="410" class="metric">Boot Time:</text>
+  <text x="640" y="410" class="metric-value">~125ms</text>
+  <text x="555" y="435" class="metric">Memory/VM:</text>
+  <text x="650" y="435" class="metric-value">5-15 MB</text>
+  <text x="555" y="460" class="metric">Isolation:</text>
+  <text x="625" y="460" class="metric-value">Hardware</text>
+  <text x="555" y="490" class="success">✓ Each VM has own kernel</text>
+  
+  <!-- ========== TRADITIONAL VM ========== -->
+  <text x="1185" y="115" text-anchor="middle" class="section-title">Traditional VMs</text>
+  
+  <!-- VM 1 -->
+  <g>
+    <rect x="1045" y="140" width="120" height="60" rx="5" class="vm-box"/>
+    <text x="1105" y="175" class="label" style="font-size: 15px;">App 1</text>
+    <rect x="1045" y="205" width="120" height="35" rx="4" class="kernel-box"/>
+    <text x="1105" y="228" class="label" style="font-size: 13px;">Full OS</text>
+  </g>
+  
+  <!-- VM 2 -->
+  <g>
+    <rect x="1185" y="140" width="120" height="60" rx="5" class="vm-box"/>
+    <text x="1245" y="175" class="label" style="font-size: 15px;">App 2</text>
+    <rect x="1185" y="205" width="120" height="35" rx="4" class="kernel-box"/>
+    <text x="1245" y="228" class="label" style="font-size: 13px;">Full OS</text>
+  </g>
+  
+  <!-- Hypervisor -->
+  <rect x="1045" y="255" width="260" height="50" rx="5" class="hypervisor-box"/>
+  <text x="1175" y="286" class="label">Full Hypervisor (ESXi/KVM)</text>
+  
+  <!-- Hardware -->
+  <rect x="1045" y="320" width="260" height="50" rx="5" class="hardware-box"/>
+  <text x="1175" y="352" class="label">Hardware</text>
+  
+  <!-- Metrics -->
+  <text x="1045" y="400" class="metric">Boot Time:</text>
+  <text x="1135" y="400" class="metric-value">5-10s</text>
+  <text x="1045" y="425" class="metric">Memory/VM:</text>
+  <text x="1155" y="425" class="metric-value">200+ MB</text>
+  <text x="1045" y="450" class="metric">Isolation:</text>
+  <text x="1125" y="450" class="metric-value">Hardware</text>
+  <text x="1045" y="480" class="success">✓ Complete isolation</text>
+  
+  <!-- ========== USE CASES ========== -->
+  <rect x="60" y="520" width="1280" height="160" rx="8" fill="#F7F9FA" stroke="#B0BEC5" stroke-width="3"/>
+  <text x="700" y="555" text-anchor="middle" class="section-title">When to Use Each</text>
+  
+  <!-- Docker use cases -->
+  <text x="90" y="590" class="metric" style="font-weight: bold; font-size: 16px;">Docker Containers:</text>
+  <text x="90" y="615" class="metric">• Single-tenant applications</text>
+  <text x="90" y="638" class="metric">• Trusted workloads</text>
+  <text x="90" y="661" class="metric">• Maximum density (1000s per host)</text>
+  
+  <!-- MicroVM use cases -->
+  <text x="530" y="590" class="metric" style="font-weight: bold; font-size: 16px;">MicroVMs:</text>
+  <text x="530" y="615" class="metric">• Multi-tenant platforms (AWS Lambda)</text>
+  <text x="530" y="638" class="metric">• Serverless functions</text>
+  <text x="530" y="661" class="metric">• Running untrusted code securely</text>
+  
+  <!-- Traditional VM use cases -->
+  <text x="980" y="590" class="metric" style="font-weight: bold; font-size: 16px;">Traditional VMs:</text>
+  <text x="980" y="615" class="metric">• Legacy applications</text>
+  <text x="980" y="638" class="metric">• Strong compliance requirements</text>
+  <text x="980" y="661" class="metric">• Non-Linux workloads</text>
+  
+  <!-- Data Sources Citation -->
+  <text x="700" y="695" text-anchor="middle" class="metric" style="font-size: 12px; font-style: italic; fill: #6C7A89;">
+    Data sources: Docker analysis toolkit (github.com/opscart/docker-internals-guide), AWS Firecracker NSDI'20 paper, industry benchmarks
+  </text>
+</svg>

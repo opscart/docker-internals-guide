@@ -10,7 +10,7 @@ Example outputs from running the Docker Analysis Toolkit on different platforms.
 Complete output from **Ubuntu 22.04 on Azure VM** (250 lines)
 
 - **All 10 tests:** ✅ Complete
-- **Platform:** Azure Standard_B2s (2 vCPU, 4GB RAM)
+- **Platform:** Azure Standard_DS1_v2 (2 vCPU, 4GB RAM)
 - **Storage:** Standard HDD
 - **Key metrics:** 629ms startup, 327 MB/s I/O, 99ms copy-up
 

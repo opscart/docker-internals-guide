@@ -1,9 +1,9 @@
-
+[0;32m
 ╔════════════════════════════════════════════════════════════╗
 ║   Docker Performance & Security Analysis Toolkit           ║
 ║   Deep-dive companion for container optimization           ║
 ╚════════════════════════════════════════════════════════════╝
-
+[0m
 
 \033[0;34mWhat this toolkit does:\033[0m
 Exposes how Linux kernel primitives (namespaces, cgroups, OverlayFS)
@@ -21,19 +21,19 @@ shape container performance, security, and operational characteristics.
 • Identify optimization opportunities (volumes vs OverlayFS, etc.)
 
 
-========================================
-Checking Prerequisites
-========================================
+[0;34m========================================[0m
+[0;34mChecking Prerequisites[0m
+[0;34m========================================[0m
 
-✓ docker found: Docker version 28.4.0, build d8eb465
-⚠ strace not found (optional for syscall tracing)
-⚠ perf not found (optional for CPU profiling)
-✓ jq found
-⚠ bpftrace not found (optional for eBPF tracing)
+[0;32m✓[0m docker found: Docker version 28.4.0, build d8eb465
+[1;33m⚠[0m strace not found (optional for syscall tracing)
+[1;33m⚠[0m perf not found (optional for CPU profiling)
+[0;32m✓[0m jq found
+[1;33m⚠[0m bpftrace not found (optional for eBPF tracing)
 
-========================================
-Test 1: Container Startup Latency
-========================================
+[0;34m========================================[0m
+[0;34mTest 1: Container Startup Latency[0m
+[0;34m========================================[0m
 
 Untagged: alpine:latest
 Deleted: sha256:865b95f46d98cf867a156fe4a135ad3fe50d2056aa3f25ed31662dff6da4eb62
@@ -65,15 +65,15 @@ Note: Container startup includes namespace creation, OverlayFS mount,
 cgroup setup, and storage I/O. Cloud environments typically show 300-700ms
 due to the combination of kernel operations and storage layer interactions.
 
-========================================
-Test 2: Container Process Hierarchy & Syscall Overview
-========================================
+[0;34m========================================[0m
+[0;34mTest 2: Container Process Hierarchy & Syscall Overview[0m
+[0;34m========================================[0m
 
-⚠ strace not available, skipping
+[1;33m⚠[0m strace not available, skipping
 
-========================================
-Test 3: OverlayFS Layer Analysis
-========================================
+[0;34m========================================[0m
+[0;34mTest 3: OverlayFS Layer Analysis[0m
+[0;34m========================================[0m
 
 Pulling multi-layer image (nginx)...
 
@@ -89,17 +89,17 @@ Image layers:
 
 Physical layer storage:
 Image ID: 8491795299c8e739b7fcc6285d531d9812ce2666e07bd3dd8db00020ad132295
-⚠ /var/lib/docker/overlay2 not accessible (may require root)
+[1;33m⚠[0m /var/lib/docker/overlay2 not accessible (may require root)
 
-========================================
-Test 4: I/O Performance Analysis
-========================================
+[0;34m========================================[0m
+[0;34mTest 4: I/O Performance Analysis[0m
+[0;34m========================================[0m
 
 === Sequential Write Performance ===
 Testing container filesystem (OverlayFS upper layer)...
 104857600 bytes (100.0MB) copied, 0.054166 seconds, 1.8GB/s
 
-Note: Volume mount test skipped on macOS Docker Desktop due to
+[1;33mNote:[0m Volume mount test skipped on macOS Docker Desktop due to
 filesystem compatibility issues. Volume performance on macOS varies significantly
 based on Docker Desktop version and APFS mount optimizations.
 
@@ -109,11 +109,11 @@ Creating container with pre-existing 100MB file...
 Triggering copy-up by modifying file in read-only layer...
 Copy-up operation time: 88ms
 
-Analysis: Copy-up overhead <100ms - acceptable for this file size.
+[0;32mAnalysis:[0m Copy-up overhead <100ms - acceptable for this file size.
 
-========================================
-Test 5: Network Performance
-========================================
+[0;34m========================================[0m
+[0;34mTest 5: Network Performance[0m
+[0;34m========================================[0m
 
 === Network Connectivity Verification ===
 Testing bridge network connectivity...
@@ -122,7 +122,7 @@ Testing bridge network connectivity...
 Testing host network connectivity...
 10 packets transmitted, 10 packets received, 0% packet loss
 
-Note: This is a connectivity sanity check, not a latency benchmark.
+[1;33mNote:[0m This is a connectivity sanity check, not a latency benchmark.
 For precise network performance analysis, use tools like iperf3 or netperf.
 
 Network mode characteristics:
@@ -134,9 +134,9 @@ Recommendations:
 • For latency-critical services: Consider host networking
 • For isolation and multi-tenancy: Use bridge networking (standard)
 
-========================================
-Test 6: Memory Efficiency & Page Cache Sharing
-========================================
+[0;34m========================================[0m
+[0;34mTest 6: Memory Efficiency & Page Cache Sharing[0m
+[0;34m========================================[0m
 
 Starting 3 identical nginx containers...
 
@@ -154,9 +154,9 @@ nginx3 (PID 4034559): N/A KB
 Note: Shared pages (like nginx binary) are counted once in physical memory
 Total reported may exceed actual RAM usage due to page cache sharing
 
-========================================
-Test 7: Security Posture Analysis
-========================================
+[0;34m========================================[0m
+[0;34mTest 7: Security Posture Analysis[0m
+[0;34m========================================[0m
 
 Checking default container capabilities...
 CapInh:	0000000000000000
@@ -176,14 +176,14 @@ CapBnd:	0000000000000000
 CapAmb:	0000000000000000
 
 Checking for privileged containers (security risk):
-✓ No privileged containers running
+[0;32m✓[0m No privileged containers running
 
 Checking Docker socket mounts (security risk):
-✓ No containers with Docker socket access
+[0;32m✓[0m No containers with Docker socket access
 
-========================================
-Test 8: CPU Performance & Throttling
-========================================
+[0;34m========================================[0m
+[0;34mTest 8: CPU Performance & Throttling[0m
+[0;34m========================================[0m
 
 === CPU Usage Without Limits ===
 Starting CPU-intensive container (infinite loop)...
@@ -196,14 +196,14 @@ Starting CPU-limited container...
 CPU usage (target: 50.00%):
 Measured: 50.32%
 Throttling accuracy: 100%
-✓ Excellent cgroup enforcement (<1% variance)
+[0;32m✓[0m Excellent cgroup enforcement (<1% variance)
 
-Analysis: CPU cgroups provide deterministic resource isolation.
+[0;32mAnalysis:[0m CPU cgroups provide deterministic resource isolation.
 This is a kernel-level guarantee, platform-invariant across infrastructure.
 
-========================================
-Test 9: Namespace Isolation Inspection
-========================================
+[0;34m========================================[0m
+[0;34mTest 9: Namespace Isolation Inspection[0m
+[0;34m========================================[0m
 
 Starting test container...
 Container PID: 4035001
@@ -222,25 +222,24 @@ PID   USER     TIME  COMMAND
     1 root      0:00 sleep 60
     7 root      0:00 ps aux
 
-========================================
-Test 10: eBPF-based Syscall Tracing (Advanced)
-========================================
+[0;34m========================================[0m
+[0;34mTest 10: eBPF-based Syscall Tracing (Advanced)[0m
+[0;34m========================================[0m
 
-⚠ bpftrace not available, skipping
+[1;33m⚠[0m bpftrace not available, skipping
 
-========================================
-Performance Analysis Summary
-========================================
+[0;34m========================================[0m
+[0;34mPerformance Analysis Summary[0m
+[0;34m========================================[0m
 
 Docker daemon info:
-WARNING: Plugin "/Users/opscart/.docker/cli-plugins/docker-desktop" is not valid: failed to fetch metadata: exit status 1
  Storage Driver: overlayfs
  Kernel Version: 6.10.14-linuxkit
  Operating System: Docker Desktop
  CPUs: 8
  Total Memory: 9.704GiB
 
-Analysis complete!
+[0;32mAnalysis complete![0m
 
 Key findings:
 1. Startup latency varies by environment:
@@ -254,7 +253,7 @@ Key findings:
 5. Page cache sharing makes multiple identical containers memory-efficient
 6. Avoid privileged containers and Docker socket mounts in production
 
-Recommendations:
+[1;33mRecommendations:[0m
 • Use multi-stage builds to reduce image size
 • Minimize layer count (combine RUN commands)
 • Drop unnecessary capabilities (--cap-drop=ALL)
@@ -262,5 +261,5 @@ Recommendations:
 • Use read-only root filesystem where possible (--read-only)
 • Enable user namespace remapping for additional security
 
-All tests completed!
+[0;32mAll tests completed![0m
 Logs and traces saved in /tmp/

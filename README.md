@@ -1,102 +1,122 @@
 # Docker Internals Guide
 
-> Comprehensive toolkit and research companion for understanding Docker's internal architecture, performance characteristics, and security model.
+> An educational toolkit for understanding Docker's kernel-level behavior through systematic measurement and analysis.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Docker](https://img.shields.io/badge/Docker-28.0-blue.svg)](https://www.docker.com/)
-[![Tested on](https://img.shields.io/badge/Tested%20on-Ubuntu%2024.04-orange.svg)](https://ubuntu.com/)
+[![Docker](https://img.shields.io/badge/Docker-29.1-blue.svg)](https://www.docker.com/)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS-lightgrey.svg)](https://github.com/opscart/docker-internals-guide)
 
 ---
 
-## 📖 About This Repository
+## 📖 What This Is
 
-This repository contains:
+An educational toolkit that demonstrates how Linux kernel primitives (namespaces, cgroups, OverlayFS) shape container performance, security, and operational characteristics through reproducible experiments.
 
-1. **Automated analysis toolkit** - Scripts to benchmark and audit Docker containers
-2. **Security hardening guides** - Production-ready configurations and examples
-3. **Research documentation** - Deep-dives into Docker internals
-4. **Reference materials** - Architecture diagrams, CVE analysis, performance data
+**This is NOT:**
+- A production monitoring tool (use Prometheus/Datadog for that)
+- A storage benchmark suite (use fio/sysbench for that)
+- A security scanner (use trivy/grype for that)
 
-**Related Article:** *Docker Internals: Architecture, Performance, and the Evolution to MicroVMs*
-> A technical deep-dive for senior engineers (Coming soon on InfoQ)
+**This IS:**
+- A learning tool for understanding Docker internals
+- A reference implementation for measuring kernel behavior
+- A baseline for comparing your own infrastructure
+- A companion to the research article (see below)
+
+**Related Article:** *Understanding Docker Performance Across Platforms: From Development to Cloud Infrastructure*  
+> Technical analysis based on three-platform testing (macOS, Azure Premium SSD, Azure Standard HDD)  
+> Published on InfoQ - [Read Article](#) (Coming January 2025)
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Docker Engine 20.10+ (tested on 28.0)
-- Linux or macOS with Docker (some tests require Linux)
+- Docker Engine 20.10+ (tested on 28.4 and 29.1)
+- Linux (Ubuntu 22.04+) or macOS with Docker Desktop
 - Root/sudo access for system inspection
-- Basic command line familiarity
+- Optional: strace, perf, bpftrace for advanced tracing
 
-### Run the Full Analysis Suite
-
+### Run the Analysis Toolkit
 ```bash
-git clone https://github.com/YOUR_USERNAME/docker-internals-guide.git
+git clone https://github.com/opscart/docker-internals-guide.git
 cd docker-internals-guide/toolkit
 chmod +x docker-analysis-toolkit.sh
 sudo ./docker-analysis-toolkit.sh
 ```
 
-**Output:** Comprehensive report covering startup latency, I/O performance, security posture, and resource utilization.
+**Execution time:** ~2-3 minutes  
+**Output:** Comprehensive report covering 10 dimensions of container behavior
 
 ---
 
-## 📊 What the Toolkit Measures
+## 📊 What Gets Measured
 
-### Performance Analysis
-- ✅ **Container startup latency** - Cold vs warm start times
-- ✅ **OverlayFS inspection** - Image layer structure
-- ✅ **I/O performance** - Write speed and copy-up overhead
-- ✅ **Network latency** - Bridge vs host mode
-- ✅ **Memory efficiency** - Page cache sharing
-- ✅ **CPU performance** - Throttling and cgroup limits
+### Performance Characteristics
+- **Container startup latency** - Decomposed into pull, runtime, and kernel operations
+- **OverlayFS behavior** - Layer structure, copy-up overhead, metadata operations
+- **I/O patterns** - Sequential writes, volume vs OverlayFS comparison
+- **CPU isolation** - Throttling accuracy and cgroup enforcement
+- **Network modes** - Bridge vs host mode connectivity
+- **Memory efficiency** - Page cache sharing across containers
 
-### Security Auditing
-- ✅ **Capability inspection** - Default and custom capabilities
-- ✅ **Privileged containers** - Dangerous configuration detection
-- ✅ **Docker socket exposure** - Root-equivalent access risks
-- ✅ **Namespace isolation** - PID, network, mount verification
-- ✅ **Resource limits** - Memory and CPU constraint validation
+### Security Posture
+- **Linux capabilities** - Default vs restricted capability sets
+- **Privileged containers** - Detection of dangerous configurations
+- **Docker socket exposure** - Root-equivalent access risks
+- **Namespace isolation** - PID, network, mount namespace verification
 
 ---
 
-## 📂 Repository Contents
-
+## 📂 Repository Structure
 ```
 docker-internals-guide/
-├── toolkit/                           # Performance & security analysis
-│   ├── docker-analysis-toolkit.sh     # Main script
-│   └── examples/                      # Sample outputs
-├── security-configs/                  # Hardening guides
+├── toolkit/
+│   ├── docker-analysis-toolkit.sh         # Main measurement script
+│   └── examples/
+│       ├── sample-output-macos.txt        # macOS Docker Desktop results
+│       ├── sample-output-azure-premium.txt    # Azure Premium SSD results
+│       └── sample-output-azure-standard.txt   # Azure Standard HDD results
+├── security-configs/                      # Hardening guides (future article)
 │   ├── docker-security-hardening.md
-│   └── examples/                      # Seccomp, AppArmor configs
-├── docs/                              # Architecture documentation
-│   ├── architecture.md
-│   ├── performance-analysis.md
-│   └── cve-analysis.md
-└── tests/                             # Individual test scripts
+│   └── examples/
+└── README.md
 ```
 
 ---
 
-## 🔬 Sample Output
+## 🔬 Sample Results
 
-```bash
-========================================
-Test 1: Container Startup Latency
-========================================
-Average startup time: 138ms
-✓ Excellent startup performance (<150ms)
+### Container Startup (from article research):
 
-========================================
-Test 7: Security Posture Analysis
-========================================
-✓ No privileged containers running
-✗ WARNING: Containers with Docker socket access:
-  jenkins-agent has root-equivalent access!
-```
+| Platform | Runtime Overhead | Copy-up (100MB) | CPU Throttling |
+|----------|------------------|-----------------|----------------|
+| **macOS Docker Desktop** | 303ms | 88ms | 50.32% (99.4% accurate) |
+| **Azure Premium SSD** | 501ms | 64ms | 49.97% (99.9% accurate) |
+| **Azure Standard HDD** | 837ms | 63ms | 50.17% (99.7% accurate) |
+
+**Key insight:** Container startup varies 2.8x from development to production budget cloud, but copy-up overhead remains consistent (~60-90ms), and CPU throttling is deterministic across all platforms (<1% variance).
+
+---
+
+## 💡 Key Findings from Three-Platform Testing
+
+### 1. **Runtime Overhead Decomposition**
+- Kernel operations (namespace creation, cgroup setup): Single-digit milliseconds
+- Storage operations (OverlayFS mount, disk I/O): 300-800ms (platform-dependent)
+- Platform overhead (containerd shim, managed disk): 100-300ms in cloud
+
+### 2. **Copy-up is Architecturally Consistent**
+- 60-90ms for 100MB file across all platforms
+- Proves it's an architectural operation with minimal storage dependency
+
+### 3. **CPU Throttling is Truly Invariant**
+- All platforms: 49.97% - 50.32% measured vs 50% target
+- <1% variance proves kernel-level determinism
+
+### 4. **Storage Tier Matters for I/O**
+- OverlayFS writes: 140 MB/s (HDD) → 354 MB/s (Premium SSD) → 1.8 GB/s (macOS)
+- Metadata operations: 2-5% overhead regardless of storage tier
 
 ---
 
@@ -104,37 +124,86 @@ Test 7: Security Posture Analysis
 
 **Ubuntu/Debian:**
 ```bash
+sudo apt-get update
 sudo apt-get install -y docker.io strace jq linux-tools-generic
 ```
 
-**RHEL/CentOS:**
+**macOS:**
 ```bash
-sudo dnf install -y docker strace jq perf
+# Install Docker Desktop from docker.com
+# Most tools (strace, perf) not available on macOS
+# The script will skip unsupported tests automatically
 ```
 
 ---
 
-## 🔐 Security Quick Start
-
+## 🔐 Security Hardening Example
 ```bash
+# Production-ready container configuration
 docker run -d \
+  --name secure-nginx \
   --cap-drop=ALL \
   --cap-add=NET_BIND_SERVICE \
   --read-only \
   --tmpfs /tmp \
+  --tmpfs /var/run \
   --security-opt=no-new-privileges \
+  --memory=512m \
+  --cpus=0.5 \
   nginx:alpine
 ```
 
-See `security-configs/` for complete hardening guide.
+See `security-configs/` for comprehensive hardening guide (detailed article coming Q1 2025).
 
 ---
 
-## 📚 Related Resources
+## 📚 Platform-Specific Notes
 
-- [Docker Internals Article on InfoQ](#) - Architecture deep-dive
-- [Docker Security Practical Guide](#) - Hands-on labs
-- [OCI Specifications](https://github.com/opencontainers/runtime-spec)
+### macOS Docker Desktop
+- Volume mount tests are skipped (APFS/LinuxKit compatibility issues)
+- Some system inspection tests require Linux kernel features
+- Results still valuable for development baseline measurements
+
+### Linux (Native Docker)
+- Full test suite supported
+- Requires sudo/root for namespace and capability inspection
+- Tested on Ubuntu 22.04 with kernel 6.8
+
+### Cloud Platforms (Azure, AWS, GCP)
+- Managed disk caching affects I/O results
+- CPU steal time may add variance in shared tenancy
+- Network-attached storage (EBS, Azure Disk) adds latency
+
+---
+
+## 🎯 Use Cases
+
+**For Learning:**
+- Understand how Docker primitives work under the hood
+- See actual kernel behavior (namespaces, cgroups, OverlayFS)
+- Compare your environment to research baselines
+
+**For Infrastructure Decisions:**
+- Quantify storage tier impact (Premium SSD vs Standard HDD)
+- Understand when optimization matters vs when it doesn't
+- Establish baseline performance for your platform
+
+**For Security Auditing:**
+- Identify privileged containers and Docker socket mounts
+- Verify capability restrictions
+- Check namespace isolation
+
+---
+
+## 🤝 Contributing
+
+This is primarily a research repository accompanying published articles. If you find issues or have suggestions:
+
+1. Open an issue describing the problem
+2. Include your platform (OS, Docker version, kernel version)
+3. Attach relevant output from the toolkit
+
+Pull requests for bug fixes are welcome.
 
 ---
 
@@ -146,12 +215,23 @@ MIT License - Free for personal and commercial use.
 
 ## 👤 Author
 
-**[Your Name]**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Article: [InfoQ](#)
+**Shamsher Khan**
+- Senior DevOps Engineer | IEEE Senior Member
+- GitHub: [@opscart](https://github.com/opscart)
+- LinkedIn: [Shamsher Khan](https://linkedin.com/in/shamsher-khan)
+- DZone: [@shamsherkhan](https://dzone.com/users/4855907/shamsherkhan.html)
 
 ---
 
-⭐ **Star this repo** if you find it useful!
+## ⭐ If You Find This Useful
 
-**Last Updated:** November 2025 | **Status:** Active Development
+- Star this repository
+- Share the accompanying article
+- Reference in your own research or blog posts
+- Provide feedback on what else you'd like to see measured
+
+---
+
+**Last Updated:** December 2024  
+**Status:** Active - Article publication in progress  
+**Next Update:** Post-publication with article links (January 2025)

@@ -34,30 +34,31 @@ Checking Prerequisites
 Test 1: Container Startup Latency
 ========================================
 
+Untagged: alpine:latest
+Deleted: sha256:865b95f46d98cf867a156fe4a135ad3fe50d2056aa3f25ed31662dff6da4eb62
 === Phase 1: Image Pull (network + extraction) ===
-Image pull time: 1178ms
+Image pull time: 824ms
 
 === Phase 2: Container Runtime (namespace + exec) ===
 Measuring first run (cold - may include overlay setup)...
-Cold start (no pull): 1224ms
+Cold start (no pull): 488ms
 
 Measuring warm start (cached layers)...
-Warm start (cached): 792ms
+Warm start (cached): 542ms
 
 === Phase 3: Average Runtime (10 iterations) ===
-Average startup time: 837ms
+Average startup time: 496ms
 
 === Decomposition Summary ===
-Pull + extraction: 1178ms (network + registry)
-Runtime overhead:  837ms (namespace + exec)
-Total cold start:  2402ms
+Pull + extraction: 824ms (network + registry)
+Runtime overhead:  496ms (namespace + exec)
+Total cold start:  1312ms
 
-The 837ms runtime overhead reflects Docker's architecture on this platform.
-This includes: namespace creation (single-digit milliseconds), OverlayFS mount,
-cgroup setup (low-millisecond range), and platform-specific operations
-(containerd shim initialization, managed disk metadata access).
-On bare metal or optimized runtimes, total overhead is typically 100-200ms.
-Runtime: 837ms
+The 496ms runtime overhead reflects Docker's architecture on this platform.
+This includes: namespace creation (~5ms), OverlayFS mount, cgroup setup (~3ms),
+and platform-specific operations (containerd shim, managed disk metadata).
+On bare metal or optimized runtimes, this overhead is typically 100-200ms.
+Runtime: 496ms
 Note: Container startup includes namespace creation, OverlayFS mount,
 cgroup setup, and storage I/O. Cloud environments typically show 300-700ms
 due to the combination of kernel operations and storage layer interactions.
@@ -70,26 +71,26 @@ Test 2: Container Process Hierarchy & Syscall Overview
 Starting test container to observe process tree...
 
 Docker daemon process:
-root        2713  0.3  0.7 1867488 60168 ?       Ssl  18:43   0:01 /usr/bin/containerd
-root        2870  0.4  1.1 2055680 95776 ?       Ssl  18:43   0:01 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
-root        4401  0.0  0.1 1233840 12708 ?       Sl   18:48   0:00 /usr/bin/containerd-shim-runc-v2 -namespace moby -id 051f8f881780daf16a16749b788a6d1b374ee2aadf9ea33a06cf402d41b0d8f3 -address /run/containerd/containerd.sock
+root        2690  0.1  0.8 1941796 70064 ?       Ssl  15:40   0:11 /usr/bin/containerd
+root        2849  0.2  1.5 2122120 125400 ?      Ssl  15:40   0:12 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+root       19579  0.0  0.1 1233584 12768 ?       Sl   17:19   0:00 /usr/bin/containerd-shim-runc-v2 -namespace moby -id 0357bf7b3b731dad8cef5083d5b1120f75e6d95d458aae46d3d1b344a7ca6d62 -address /run/containerd/containerd.sock
 
 Container process hierarchy:
-Container PID: 4425
+Container PID: 19602
 
 Process details:
 UID          PID    PPID  C STIME TTY          TIME CMD
-root        4425    4401  1 18:48 ?        00:00:00 sleep 60
+root       19602   19579  0 17:19 ?        00:00:00 sleep 60
 
 Parent process chain:
     PID    PPID COMMAND
-   4425    4401 sleep
+  19602   19579 sleep
 
 Namespace IDs (proves isolation exists):
-lrwxrwxrwx 1 root root 0 Dec 30 18:48 mnt -> mnt:[4026532155]
-lrwxrwxrwx 1 root root 0 Dec 30 18:48 net -> net:[4026532160]
-lrwxrwxrwx 1 root root 0 Dec 30 18:48 pid -> pid:[4026532158]
-lrwxrwxrwx 1 root root 0 Dec 30 18:48 pid_for_children -> pid:[4026532158]
+lrwxrwxrwx 1 root root 0 Dec 30 17:19 mnt -> mnt:[4026532154]
+lrwxrwxrwx 1 root root 0 Dec 30 17:19 net -> net:[4026532160]
+lrwxrwxrwx 1 root root 0 Dec 30 17:19 pid -> pid:[4026532158]
+lrwxrwxrwx 1 root root 0 Dec 30 17:19 pid_for_children -> pid:[4026532158]
 
 === Syscall Tracing Attempt ===
 Note: Tracing container creation syscalls requires attaching to containerd/runc
@@ -127,7 +128,7 @@ Image layers:
             ]
         },
         "Metadata": {
-            "LastTagTime": "2025-12-30T18:48:38.952099335Z"
+            "LastTagTime": "2025-12-30T17:19:33.24808565Z"
         },
         "Descriptor": {
             "mediaType": "application/vnd.oci.image.index.v1+json",
@@ -147,10 +148,10 @@ Test 4: I/O Performance Analysis
 
 === Sequential Write Performance ===
 Testing container filesystem (OverlayFS upper layer)...
-104857600 bytes (100.0MB) copied, 0.713887 seconds, 140.1MB/s
+104857600 bytes (100.0MB) copied, 0.271779 seconds, 367.9MB/s
 
 Testing with volume mount (bypasses OverlayFS)...
-104857600 bytes (100.0MB) copied, 1.284511 seconds, 77.9MB/s
+104857600 bytes (100.0MB) copied, 0.770383 seconds, 129.8MB/s
 
 Note on I/O Results:
 Sequential write throughput varies based on multiple factors:
@@ -166,21 +167,22 @@ behavioral differences in write handling, not raw performance parity.
 
 === OverlayFS Copy-up Overhead ===
 Creating container with pre-existing 100MB file...
--rw-r--r--    1 root     root      100.0M Dec 30 18:48 /bigfile
+-rw-r--r--    1 root     root      100.0M Dec 30 17:19 /bigfile
 Triggering copy-up by modifying file in read-only layer...
-Copy-up operation time: 63ms
+Copy-up operation time: 67ms
 
 Analysis: Copy-up overhead <100ms - acceptable for this file size.
 
 === OverlayFS vs Volume: Metadata Operations ===
 Testing metadata-heavy workload (file creation patterns)...
 OverlayFS (container filesystem):
-  500 file creates: 1188ms
+  500 file creates: 796ms
 Volume mount (direct filesystem):
-  500 file creates: 1155ms
+  500 file creates: 734ms
 
-OverlayFS metadata overhead: 33ms (1188ms vs 1155ms)
-OverlayFS overhead is minimal (2%) for this workload pattern.
+OverlayFS metadata overhead: 62ms (796ms vs 734ms)
+OverlayFS shows 8% overhead - sensitivity to metadata patterns.
+Impact depends on workload characteristics and file operation frequency.
 
 Note: Metadata operation overhead varies significantly with:
 • Number of files (tested: 500 files, increase to 5000+ for heavier pressure)
@@ -198,17 +200,14 @@ Testing bridge network connectivity...
 Testing host network connectivity...
 10 packets transmitted, 10 packets received, 0% packet loss
 
-Note: This is a connectivity sanity check, not a latency benchmark.
-For precise network performance analysis, use tools like iperf3 or netperf.
+Note: This is a connectivity sanity check, not a performance benchmark.
+For actual network performance analysis, use tools like iperf3 or netperf.
 
-Network mode characteristics:
-• Bridge mode: Adds veth pair + iptables NAT
-  (typical overhead: ~0.1-0.3ms based on kernel networking behavior)
+Network overhead comparison:
+• Bridge mode: Adds veth pair + iptables NAT (~0.1-0.3ms latency)
 • Host mode: Direct host network stack (minimal overhead)
-
-Recommendations:
 • For latency-critical services: Consider host networking
-• For isolation and multi-tenancy: Use bridge networking (standard)
+• For isolation: Use bridge networking (standard)
 
 ========================================
 Test 6: Memory Efficiency & Page Cache Sharing
@@ -218,14 +217,14 @@ Starting 3 identical nginx containers...
 
 Individual container memory usage:
 NAME      MEM USAGE / LIMIT     MEM %
-nginx1    3.285MiB / 7.709GiB   0.04%
-nginx2    3.254MiB / 7.709GiB   0.04%
-nginx3    3.262MiB / 7.709GiB   0.04%
+nginx1    3.234MiB / 7.709GiB   0.04%
+nginx2    3.23MiB / 7.709GiB    0.04%
+nginx3    3.25MiB / 7.709GiB    0.04%
 
 Physical memory (RSS) per container:
-nginx1 (PID 6463):  6016 KB
-nginx2 (PID 6554):  5888 KB
-nginx3 (PID 6643):  6016 KB
+nginx1 (PID 21598):  5888 KB
+nginx2 (PID 21689):  6144 KB
+nginx3 (PID 21777):  5888 KB
 
 Note: Shared pages (like nginx binary) are counted once in physical memory
 Total reported may exceed actual RAM usage due to page cache sharing
@@ -265,12 +264,12 @@ Test 8: CPU Performance & Throttling
 Starting CPU-intensive container (infinite loop)...
 CPU usage:
 NAME       CPU %
-cpu-test   100.78%
+cpu-test   99.17%
 
 === CPU Throttling Test (50% of 1 core) ===
 Starting CPU-limited container...
 CPU usage (target: 50.00%):
-Measured: 50.17%
+Measured: 50.12%
 Throttling accuracy: 100%
 ✓ Excellent cgroup enforcement (<1% variance)
 
@@ -282,26 +281,26 @@ Test 9: Namespace Isolation Inspection
 ========================================
 
 Starting test container...
-Container PID: 7467
+Container PID: 22603
 
 Namespace links for container process:
 total 0
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 cgroup -> cgroup:[4026532159]
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 ipc -> ipc:[4026532157]
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 mnt -> mnt:[4026532155]
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 net -> net:[4026532160]
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 pid -> pid:[4026532158]
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 pid_for_children -> pid:[4026532158]
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 time -> time:[4026531834]
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 time_for_children -> time:[4026531834]
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 user -> user:[4026531837]
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 uts -> uts:[4026532156]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 cgroup -> cgroup:[4026532159]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 ipc -> ipc:[4026532156]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 mnt -> mnt:[4026532154]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 net -> net:[4026532160]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 pid -> pid:[4026532158]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 pid_for_children -> pid:[4026532158]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 time -> time:[4026531834]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 time_for_children -> time:[4026531834]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 user -> user:[4026531837]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 uts -> uts:[4026532155]
 
 Comparing to host namespaces:
 Host PID namespace:
-lrwxrwxrwx 1 root root 0 Dec 30 18:43 /proc/1/ns/pid -> pid:[4026531836]
+lrwxrwxrwx 1 root root 0 Dec 30 15:40 /proc/1/ns/pid -> pid:[4026531836]
 Container PID namespace:
-lrwxrwxrwx 1 root root 0 Dec 30 18:49 /proc/7467/ns/pid -> pid:[4026532158]
+lrwxrwxrwx 1 root root 0 Dec 30 17:20 /proc/22603/ns/pid -> pid:[4026532158]
 
 Container's view of processes (should only see itself):
 PID   USER     TIME  COMMAND

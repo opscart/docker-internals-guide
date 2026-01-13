@@ -1,6 +1,6 @@
 # Docker Internals Guide
 
-> An educational toolkit for understanding Docker's kernel-level behavior through systematic measurement and analysis.
+> Toolkit for Decomposing Docker Startup Behavior and System Characteristics
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Docker](https://img.shields.io/badge/Docker-29.1-blue.svg)](https://www.docker.com/)
@@ -10,22 +10,36 @@
 
 ## 📖 What This Is
 
-An educational toolkit that demonstrates how Linux kernel primitives (namespaces, cgroups, OverlayFS) shape container performance, security, and operational characteristics through reproducible experiments.
+An educational toolkit that demonstrates how Linux kernel primitives (namespaces, cgroups, OverlayFS) shape container performance through reproducible experiments.
+
+**Purpose:** Decompose Docker startup latency to identify which portions are architectural constants versus infrastructure variables.
 
 **This is NOT:**
-- A production monitoring tool (use Prometheus/Datadog for that)
-- A storage benchmark suite (use fio/sysbench for that)
+- A controlled storage benchmark (use fio/sysbench for that)
+- A platform comparison tool (each environment has multiple variables)
+- A production monitoring solution (use Prometheus/Datadog for that)
 - A security scanner (use trivy/grype for that)
 
 **This IS:**
 - A learning tool for understanding Docker internals
-- A reference implementation for measuring kernel behavior
-- A baseline for comparing your own infrastructure
-- A companion to the research article (see below)
+- A methodology for measuring performance decomposition  
+- A baseline reference for your own infrastructure
+- A companion to published research articles
 
-**Related Article:** *Understanding Docker Performance Across Platforms: From Development to Cloud Infrastructure*  
-> Technical analysis based on three-platform testing (macOS, Azure Premium SSD, Azure Standard HDD)  
-> Published on InfoQ - [Read Article](#) (Coming January 2025)
+---
+
+## ⚠️ Important Note on Methodology
+
+This toolkit is not a controlled comparison of storage technologies or platforms. Each environment combines multiple characteristics (runtime, kernel, storage path, caching). The purpose is to decompose Docker startup latency and identify which portions are invariant and which are environment-dependent. Storage behavior emerges as a dominant contributor, but it is not isolated as a single experimental variable.
+
+---
+
+## 📄 Related Articles
+
+**"Understanding Docker Startup Performance: A Three-Tier Analysis From 303ms to 837ms"**
+- Published on [OpsCart Blog](https://opscart.com/understanding-docker-startup-performance)
+- Analysis of container performance decomposition across infrastructure tiers
+- Based on measurements from this toolkit
 
 ---
 
@@ -77,7 +91,7 @@ docker-internals-guide/
 │       ├── sample-output-macos.txt        # macOS Docker Desktop results
 │       ├── sample-output-azure-premium.txt    # Azure Premium SSD results
 │       └── sample-output-azure-standard.txt   # Azure Standard HDD results
-├── security-configs/                      # Hardening guides (future article)
+├── security-configs/                      # Hardening guides
 │   ├── docker-security-hardening.md
 │   └── examples/
 └── README.md
@@ -87,19 +101,31 @@ docker-internals-guide/
 
 ## 🔬 Sample Results
 
-### Container Startup (from article research):
+The toolkit has been validated across three infrastructure tiers:
 
-| Platform | Runtime Overhead | Copy-up (100MB) | CPU Throttling |
-|----------|------------------|-----------------|----------------|
-| **macOS Docker Desktop** | 303ms | 88ms | 50.32% (99.4% accurate) |
-| **Azure Premium SSD** | 501ms | 64ms | 49.97% (99.9% accurate) |
-| **Azure Standard HDD** | 837ms | 63ms | 50.17% (99.7% accurate) |
+### Development Tier (macOS Docker Desktop)
+- Runtime overhead: **303ms**
+- Copy-up (100MB): **88ms**
+- CPU throttling accuracy: **99.36%** (50.32% measured vs 50% target)
+- Platform: MacBook Pro, Docker Desktop 28.4.0
 
-**Key insight:** Container startup varies 2.8x from development to production budget cloud, but copy-up overhead remains consistent (~60-90ms), and CPU throttling is deterministic across all platforms (<1% variance).
+### Production-Optimized (Azure Premium SSD)
+- Runtime overhead: **501ms** 
+- Copy-up (100MB): **64ms**
+- CPU throttling accuracy: **99.94%** (49.97% measured vs 50% target)
+- Platform: Standard_D2s_v3, Premium SSD
+
+### Production-Budget (Azure Standard HDD)
+- Runtime overhead: **837ms**
+- Copy-up (100MB): **63ms**
+- CPU throttling accuracy: **99.66%** (50.17% measured vs 50% target)
+- Platform: Standard_D2s_v3, Standard HDD
+
+**Key Finding:** Container startup decomposes into invariant kernel operations (~10ms) and variable infrastructure operations (200-600ms). See the published article for complete analysis.
 
 ---
 
-## 💡 Key Findings from Three-Platform Testing
+## 💡 Key Findings from Three-Tier Analysis
 
 ### 1. **Runtime Overhead Decomposition**
 - Kernel operations (namespace creation, cgroup setup): Single-digit milliseconds
@@ -153,7 +179,7 @@ docker run -d \
   nginx:alpine
 ```
 
-See `security-configs/` for comprehensive hardening guide (detailed article coming Q1 2025).
+See `security-configs/` for comprehensive hardening guide.
 
 ---
 
@@ -197,7 +223,7 @@ See `security-configs/` for comprehensive hardening guide (detailed article comi
 
 ## 🤝 Contributing
 
-This is primarily a research repository accompanying published articles. If you find issues or have suggestions:
+This is a research repository accompanying published articles. If you find issues or have suggestions:
 
 1. Open an issue describing the problem
 2. Include your platform (OS, Docker version, kernel version)
@@ -217,6 +243,7 @@ MIT License - Free for personal and commercial use.
 
 **Shamsher Khan**
 - Senior DevOps Engineer | IEEE Senior Member
+- Blog: [opscart.com](https://opscart.com)
 - GitHub: [@opscart](https://github.com/opscart)
 - LinkedIn: [Shamsher Khan](https://linkedin.com/in/shamsher-khan)
 - DZone: [@shamsherkhan](https://dzone.com/users/4855907/shamsherkhan.html)
@@ -232,6 +259,5 @@ MIT License - Free for personal and commercial use.
 
 ---
 
-**Last Updated:** December 2024  
-**Status:** Active - Article publication in progress  
-**Next Update:** Post-publication with article links (January 2025)
+**Last Updated:** January 2025
+**Status:** Active

@@ -1,0 +1,29 @@
+=== Platform Information ===
+Collected: 2026-02-14T18:13:14Z
+Platform Label: macos-docker-desktop
+
+--- OS ---
+Darwin MacBookPro.lan 25.0.0 Darwin Kernel Version 25.0.0: Wed Sep 17 21:41:45 PDT 2025; root:xnu-12377.1.9~141/RELEASE_ARM64_T6000 arm64
+
+ProductName:		macOS
+ProductVersion:		26.0.1
+BuildVersion:		25A362
+
+--- CPU ---
+Apple M1 Pro
+CPU cores: 10
+
+--- Memory ---
+Total: 16 GB
+
+--- Storage ---
+Filesystem        Size    Used   Avail Capacity iused ifree %iused  Mounted on
+/dev/disk3s1s1   460Gi    16Gi   171Gi     9%    447k  1.8G    0%   /
+
+--- Docker ---
+28.4.0
+overlayfs
+
+--- Kernel ---
+25.0.0
+

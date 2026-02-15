@@ -1,0 +1,61 @@
+=== Qualitative Observations ===
+Collected: 2026-02-14T22:57:08Z
+Platform: macos-docker-desktop
+Script Version: v3
+
+--- OverlayFS Layer Structure (nginx:alpine) ---
+[
+    "sha256:45f3ea5848e8a25ca27718b640a21ffd8c8745d342a24e1d4ddfc8c449b0a724",
+    "sha256:cfbf14f957f135ecac2f5cdb4300b7da195c76c5a4fca78c607f72ac5d441b58",
+    "sha256:ce442f0e19c5d92e00b35bd42dd09a30f888fe20fe4f67312fbecb971dc23332",
+    "sha256:b55a1191629ec484f3f711c05a6c942612e3a98d52587ec1b15a540ba356b054",
+    "sha256:ca1e0477244ef9f19fbf1ba3e2e90adb8970d6c0ba2e5e7c3cebdccd75cc0e9a",
+    "sha256:e7a74677e0bc45b7dd960eaefe32a84ac5e79df7674251a62e8c22adf3d5b6af",
+    "sha256:a5aee8cb909c972fc4c418d1ffbfb9662d41070218c98a2f55c062bb45c9771a",
+    "sha256:5196ca0ce6008355f2f58276a7628e88b6cb88befd0aa71ca3ba1f2785b1342b"
+]
+Layer count: 8
+
+--- Physical Layer Storage ---
+/var/lib/docker/overlay2 not accessible (macOS uses VM-based storage)
+
+--- Storage Driver ---
+overlayfs
+
+--- Docker Daemon Info ---
+ Storage Driver: overlayfs
+ Kernel Version: 6.10.14-linuxkit
+ Operating System: Docker Desktop
+ CPUs: 8
+ Total Memory: 9.704GiB
+
+--- Default Container Capabilities ---
+CapInh:	0000000000000000
+CapPrm:	00000000a80425fb
+CapEff:	00000000a80425fb
+CapBnd:	00000000a80425fb
+CapAmb:	0000000000000000
+
+--- Restricted Capabilities (--cap-drop=ALL) ---
+CapInh:	0000000000000000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	0000000000000000
+CapAmb:	0000000000000000
+
+--- Privileged Container Check ---
+WARNING: Privileged containers detected: true /opscart-m03
+true /opscart-m02
+true /opscart
+
+--- Docker Socket Mount Check ---
+No containers with Docker socket access
+
+--- Namespace Isolation ---
+Namespace inspection not available (expected on macOS)
+
+--- Syscall Trace (strace) ---
+strace not available on this platform (expected on macOS)
+
+--- eBPF Tracing ---
+bpftrace not available (expected on macOS and some cloud VMs)

@@ -1,0 +1,41 @@
+=== Platform Information ===
+Collected: 2026-02-15T00:48:33Z
+Platform Label: azure-standard-hdd
+Script Version: v3
+
+--- OS ---
+Linux docker-research-standard-hdd 6.8.0-1044-azure #50~22.04.1-Ubuntu SMP Wed Dec  3 15:13:22 UTC 2025 x86_64 x86_64 x86_64 GNU/Linux
+
+PRETTY_NAME="Ubuntu 22.04.5 LTS"
+NAME="Ubuntu"
+VERSION_ID="22.04"
+VERSION="22.04.5 LTS (Jammy Jellyfish)"
+VERSION_CODENAME=jammy
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=jammy
+
+--- CPU ---
+model name	: Intel(R) Xeon(R) Platinum 8171M CPU @ 2.60GHz
+CPU cores: 2
+
+--- Memory ---
+               total        used        free      shared  buff/cache   available
+Mem:           7.7Gi       356Mi       6.9Gi       3.0Mi       440Mi       7.1Gi
+Swap:             0B          0B          0B
+
+--- Storage ---
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root        62G  2.6G   60G   5% /
+Disk type: HDD
+
+--- Docker ---
+28.2.2
+overlay2
+
+--- Kernel ---
+6.8.0-1044-azure

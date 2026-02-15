@@ -1,0 +1,113 @@
+=== Qualitative Observations ===
+Collected: 2026-02-15T01:28:55Z
+Platform: azure-premium-ssd
+Script Version: v3
+
+--- OverlayFS Layer Structure (nginx:alpine) ---
+[
+    "sha256:989e799e634906e94dc9a5ee2ee26fc92ad260522990f26e707861a5f52bf64e",
+    "sha256:53998a5033c3c508a3912f390e036cf2d3761839a9f33a3116eb4610cff01f5a",
+    "sha256:660f9a93104fa1af3115dcecdc51a462e39ac850c8d23d7517fb324aceaa1b64",
+    "sha256:f35bcec50d8c988c543832ca1bfe8a008dbf52fbbb64e050a3617b5c8b17af40",
+    "sha256:aa0fc249df10e9949b4deb92b6611a7d25203282b7bfe69c4482a8a717f79510",
+    "sha256:6c0e59fd138a72dba956ed6d98dbca77200fd4d822ac65e8f1d04175e441d523",
+    "sha256:7b2903554e639cafe89adc85ab96a86c767c9a88dfa90de2dfbe48a7988aec26",
+    "sha256:da3ac26fdf0f7491d981691d9204d050a9d906fabfd5a6f73c0a14ed7304117f"
+]
+Layer count: 8
+
+--- Physical Layer Storage ---
+Layer directories in /var/lib/docker/overlay2/:
+/var/lib/docker/overlay2
+/var/lib/docker/overlay2/dbb35a47f06803e35ad3a442b6ef040952f915c22875d5156bebf7b36cdf26fb
+/var/lib/docker/overlay2/59a3353ea0a87877ce94fd57df085f2b059d2994b9c752e2f5fb4ec53062fca2
+/var/lib/docker/overlay2/b678567cc892ac2d3e79d1bafe5d96955578e33d091061417271fa42e9ecf15e
+/var/lib/docker/overlay2/be9cff6b618c9d05f5efc1b4bd5199f651f83d4d9daeac391ac41595d1767cca
+/var/lib/docker/overlay2/l
+/var/lib/docker/overlay2/d35619cefc67801530dad7726f259f8b136f0f59ce7e7648cdf9090a1eb3bd6d
+/var/lib/docker/overlay2/33a89a6f5fc0e49395c816592ca1f526f93e332a8f04ba73b4b93dd7c5f3e358
+/var/lib/docker/overlay2/fe6792ec85589d8e030eaefdf36eea36213e6a157d04aadbe86d0af484e2569a
+/var/lib/docker/overlay2/2e0881981419b3f504308923c9fe4d6c3843de5f6e90001c3c1d85ec78d9f3b2
+
+--- Storage Driver ---
+overlay2
+
+--- Docker Daemon Info ---
+ Storage Driver: overlay2
+ Kernel Version: 6.8.0-1044-azure
+ Operating System: Ubuntu 22.04.5 LTS
+ CPUs: 2
+ Total Memory: 7.705GiB
+
+--- Default Container Capabilities ---
+CapInh:	0000000000000000
+CapPrm:	00000000a80425fb
+CapEff:	00000000a80425fb
+CapBnd:	00000000a80425fb
+CapAmb:	0000000000000000
+
+--- Restricted Capabilities (--cap-drop=ALL) ---
+CapInh:	0000000000000000
+CapPrm:	0000000000000000
+CapEff:	0000000000000000
+CapBnd:	0000000000000000
+CapAmb:	0000000000000000
+
+--- Privileged Container Check ---
+No privileged containers running
+
+--- Docker Socket Mount Check ---
+No containers with Docker socket access
+
+--- Namespace Isolation ---
+Container PID: 814577
+Container namespaces:
+total 0
+dr-x--x--x 2 root root 0 Feb 15 01:28 .
+dr-xr-xr-x 9 root root 0 Feb 15 01:28 ..
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 cgroup -> cgroup:[4026532161]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 ipc -> ipc:[4026532159]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 mnt -> mnt:[4026532157]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 net -> net:[4026532162]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 pid -> pid:[4026532160]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 pid_for_children -> pid:[4026532160]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 time -> time:[4026531834]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 time_for_children -> time:[4026531834]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 user -> user:[4026531837]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 uts -> uts:[4026532158]
+
+Host namespaces (PID 1):
+total 0
+dr-x--x--x 2 root root 0 Feb 15 01:28 .
+dr-xr-xr-x 9 root root 0 Feb 14 18:25 ..
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 cgroup -> cgroup:[4026531835]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 ipc -> ipc:[4026531839]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 mnt -> mnt:[4026531841]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 net -> net:[4026531840]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 pid -> pid:[4026531836]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 pid_for_children -> pid:[4026531836]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 time -> time:[4026531834]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 time_for_children -> time:[4026531834]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 user -> user:[4026531837]
+lrwxrwxrwx 1 root root 0 Feb 15 01:28 uts -> uts:[4026531838]
+
+Container process view:
+PID   USER     TIME  COMMAND
+    1 root      0:00 sleep 30
+    7 root      0:00 ps aux
+
+--- Syscall Trace (strace) ---
+traced
+clone() calls: 0
+0
+unshare() calls: 0
+0
+mount() calls: 0
+0
+setns() calls: 0
+0
+execve() calls: 1
+Full trace saved to: /tmp/docker-syscall-trace-azure-premium-ssd.log
+
+--- eBPF Tracing ---
+bpftrace not available (expected on macOS and some cloud VMs)

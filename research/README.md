@@ -1,7 +1,7 @@
-# Research: Decomposing Container Startup Performance
+# Research: Decomposing Docker Container Startup Performance
 
-> Measurement data and analysis scripts supporting the paper:  
-> **"Decomposing Container Startup Performance: A Three-Tier Measurement Study of Docker on Heterogeneous Infrastructure"**
+> Measurement data and analysis scripts supporting the paper:
+> **"Decomposing Docker Container Startup Performance: A Three-Tier Measurement Study of Docker on Heterogeneous Infrastructure"**
 
 ## Overview
 
@@ -9,11 +9,13 @@ This directory contains the reproducible measurement framework and raw data
 for a systematic study of Docker container performance across three
 infrastructure tiers:
 
-| Platform                | Storage          | Purpose                    |
-|-------------------------|------------------|----------------------------|
-| macOS Docker Desktop    | NVMe SSD (APFS)  | Development baseline       |
-| Azure Premium SSD       | Managed P10 SSD   | Production-optimized       |
-| Azure Standard HDD      | Managed HDD       | Production-budget          |
+| Platform                | Storage                     | Purpose                    |
+|-------------------------|-----------------------------|----------------------------|
+| macOS Docker Desktop    | NVMe SSD (APFS via VM)      | Development baseline       |
+| Azure Premium SSD       | Managed P10 SSD             | Production-optimized       |
+| Azure Standard HDD      | Managed HDD                 | Production-budget          |
+
+> **Note:** macOS Docker Desktop accesses host storage through the Hypervisor.framework VM, not bare-metal NVMe. All macOS I/O measurements reflect this virtualization layer.
 
 ## Quick Start
 
@@ -46,18 +48,21 @@ python3 analyze_results.py --compare \
 
 ## Measurements
 
-The benchmark script measures 7 dimensions, each with 50 iterations
+The benchmark suite measures 10 dimensions, each with 50 iterations
 (except pull time: 10 iterations):
 
-| # | Test                    | Output CSV                    | Key Metric                |
-|---|-------------------------|-------------------------------|---------------------------|
-| 1 | Container startup       | 01-startup-latency.csv        | Warm/cold start time (ms) |
-| 2 | Copy-up overhead        | 02-copyup-overhead.csv        | 100MB copy-up time (ms)   |
-| 3 | CPU throttling          | 03-cpu-throttling.csv         | Accuracy vs 50% target    |
-| 4 | Sequential writes       | 04-write-performance.csv      | OverlayFS vs volume MB/s  |
-| 5 | Metadata operations     | 05-metadata-operations.csv    | 500-file creation time    |
-| 6 | Image pull time         | 06-image-pull-time.csv        | Cold pull latency (ms)    |
-| 7 | Namespace overhead      | 07-namespace-overhead.csv     | Isolation primitive cost   |
+| #  | Test                    | Output CSV                    | Key Metric                 |
+|----|-------------------------|-------------------------------|----------------------------|
+| 1  | Container startup       | 01-startup-latency.csv        | Warm/cold start time (ms)  |
+| 2  | Copy-up overhead        | 02-copyup-overhead.csv        | 100MB copy-up time (ms)    |
+| 3  | CPU throttling          | 03-cpu-throttling.csv         | Accuracy vs 50% target     |
+| 4  | Sequential writes       | 04-write-performance.csv      | OverlayFS vs volume MB/s   |
+| 5  | Metadata operations     | 05-metadata-operations.csv    | 500-file creation time     |
+| 6  | Image pull time         | 06-image-pull-time.csv        | Cold pull latency (ms)     |
+| 7  | Namespace overhead      | 07-namespace-overhead.csv     | Isolation primitive cost    |
+| 8  | Network latency         | 08-network-latency.csv        | Bridge vs host mode (ms)   |
+| 9  | Memory/page-cache       | 09-memory-sharing.csv         | Page cache sharing efficiency |
+| 10 | Image pull (disaggregated) | 10-pull-breakdown.csv      | Pull/extract/mount splits  |
 
 ## Statistical Methods
 
@@ -71,7 +76,7 @@ The benchmark script measures 7 dimensions, each with 50 iterations
 
 Controlled variables across Azure VMs:
 - VM Size: Standard_D2s_v3 (2 vCPU, 8GB RAM)
-- Docker Engine: 29.1.3
+- Docker Engine: 28.x (Ubuntu), 28.4.0 (macOS Docker Desktop)
 - Kernel: 6.8.0-1044-azure (Ubuntu 22.04)
 - Container images: alpine:latest, nginx:latest, python:3.11-slim
 
@@ -88,18 +93,19 @@ Controlled variables across Azure VMs:
 If you use this data or methodology, please cite:
 
 ```bibtex
-@article{khan2025docker,
-  title={Decomposing Container Startup Performance: A Three-Tier 
+@article{khan2026docker,
+  title={Decomposing Docker Container Startup Performance: A Three-Tier
          Measurement Study of Docker on Heterogeneous Infrastructure},
   author={Khan, Shamsher},
-  year={2025},
-  note={Preprint}
+  journal={arXiv preprint},
+  year={2026},
+  note={Submitted to arXiv [cs.PF]}
 }
 ```
 
 ## Author
 
-**Shamsher Khan**  
-Senior DevOps Engineer, GlobalLogic (Hitachi Group)  
-IEEE Senior Member  
+**Shamsher Khan**
+Senior DevOps Engineer, GlobalLogic (Hitachi Group)
+IEEE Senior Member
 GitHub: [@opscart](https://github.com/opscart)

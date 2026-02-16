@@ -1,57 +1,47 @@
 # Docker Internals Guide
 
-> Toolkit for Decomposing Docker Startup Behavior and System Characteristics
+> Comprehensive toolkit and research companion for understanding Docker's internal architecture, performance characteristics, and security model.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Docker](https://img.shields.io/badge/Docker-29.1-blue.svg)](https://www.docker.com/)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS-lightgrey.svg)](https://github.com/opscart/docker-internals-guide)
+[![Docker](https://img.shields.io/badge/Docker-28.0-blue.svg)](https://www.docker.com/)
+[![Tested on](https://img.shields.io/badge/Tested%20on-Ubuntu%2022.04-orange.svg)](https://ubuntu.com/)
 
 ---
 
-## 📖 What This Is
+## Research Paper
 
-An educational toolkit that demonstrates how Linux kernel primitives (namespaces, cgroups, OverlayFS) shape container performance through reproducible experiments.
+This repository accompanies the paper:
 
-**Purpose:** Decompose Docker startup latency to identify which portions are architectural constants versus infrastructure variables.
+> **"Decomposing Docker Container Startup Performance: A Three-Tier Measurement Study on Heterogeneous Infrastructure"**
+> Shamsher Khan, 2026
+> arXiv: [cs.PF] — *link will be added upon acceptance*
 
-**This is NOT:**
-- A controlled storage benchmark (use fio/sysbench for that)
-- A platform comparison tool (each environment has multiple variables)
-- A production monitoring solution (use Prometheus/Datadog for that)
-- A security scanner (use trivy/grype for that)
-
-**This IS:**
-- A learning tool for understanding Docker internals
-- A methodology for measuring performance decomposition  
-- A baseline reference for your own infrastructure
-- A companion to published research articles
+The [`research/`](research/) directory contains the benchmark scripts, raw CSV data, and analysis tools for full reproducibility of all results reported in the paper.
 
 ---
 
-## ⚠️ Important Note on Methodology
+## About This Repository
 
-This toolkit is not a controlled comparison of storage technologies or platforms. Each environment combines multiple characteristics (runtime, kernel, storage path, caching). The purpose is to decompose Docker startup latency and identify which portions are invariant and which are environment-dependent. Storage behavior emerges as a dominant contributor, but it is not isolated as a single experimental variable.
+This repository contains:
 
----
-
-## 📄 Related Articles
-
-**"Understanding Docker Startup Performance: A Three-Tier Analysis From 303ms to 837ms"**
-- Published on [OpsCart Blog](https://opscart.com/understanding-docker-startup-performance)
-- Analysis of container performance decomposition across infrastructure tiers
-- Based on measurements from this toolkit
+1. **Automated analysis toolkit** — Scripts to benchmark and audit Docker containers
+2. **Security hardening guides** — Production-ready configurations and examples
+3. **Research documentation** — Deep-dives into Docker internals with measurement data
+4. **Reference materials** — Architecture diagrams, CVE analysis, performance data
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
-- Docker Engine 20.10+ (tested on 28.4 and 29.1)
-- Linux (Ubuntu 22.04+) or macOS with Docker Desktop
+- Docker Engine 20.10+ (tested on 28.x)
+- **Tested Platforms:**
+  - **Ubuntu 22.04 (Azure VM)** — All 10 tests complete
+  - **macOS Docker Desktop 28.4.0** — 7/10 tests (expected; strace/eBPF unavailable)
 - Root/sudo access for system inspection
-- Optional: strace, perf, bpftrace for advanced tracing
 
-### Run the Analysis Toolkit
+### Run the Full Analysis Suite
+
 ```bash
 git clone https://github.com/opscart/docker-internals-guide.git
 cd docker-internals-guide/toolkit
@@ -59,205 +49,115 @@ chmod +x docker-analysis-toolkit.sh
 sudo ./docker-analysis-toolkit.sh
 ```
 
-**Execution time:** ~2-3 minutes  
-**Output:** Comprehensive report covering 10 dimensions of container behavior
+**Output:** Comprehensive report covering all 10 tests including:
+- Container startup latency (cold/warm)
+- Syscall tracing with strace
+- OverlayFS layer inspection
+- I/O performance and copy-up overhead
+- Network performance analysis
+- Memory efficiency and page cache sharing
+- Security posture audit
+- CPU throttling verification
+- Namespace isolation inspection
+- eBPF-based syscall tracing (optional)
+
+**Platform Results:**
+- Linux: All 10 tests execute (see [examples](toolkit/examples/))
+- macOS: 7/10 tests (strace, eBPF not available — expected)
 
 ---
 
-## 📊 What Gets Measured
+## What the Toolkit Measures
 
-### Performance Characteristics
-- **Container startup latency** - Decomposed into pull, runtime, and kernel operations
-- **OverlayFS behavior** - Layer structure, copy-up overhead, metadata operations
-- **I/O patterns** - Sequential writes, volume vs OverlayFS comparison
-- **CPU isolation** - Throttling accuracy and cgroup enforcement
-- **Network modes** - Bridge vs host mode connectivity
-- **Memory efficiency** - Page cache sharing across containers
+### Performance Analysis
+- **Container startup latency** — Cold vs warm start times
+- **OverlayFS inspection** — Image layer structure
+- **I/O performance** — Write speed and copy-up overhead
+- **Network latency** — Bridge vs host mode
+- **Memory efficiency** — Page cache sharing
+- **CPU performance** — Throttling and cgroup limits
 
-### Security Posture
-- **Linux capabilities** - Default vs restricted capability sets
-- **Privileged containers** - Detection of dangerous configurations
-- **Docker socket exposure** - Root-equivalent access risks
-- **Namespace isolation** - PID, network, mount namespace verification
+### Security Auditing
+- **Capability inspection** — Default and custom capabilities
+- **Privileged containers** — Dangerous configuration detection
+- **Docker socket exposure** — Root-equivalent access risks
+- **Namespace isolation** — PID, network, mount verification
+- **Resource limits** — Memory and CPU constraint validation
 
 ---
 
-## 📂 Repository Structure
+## Repository Contents
+
 ```
 docker-internals-guide/
-├── toolkit/
-│   ├── docker-analysis-toolkit.sh         # Main measurement script
-│   └── examples/
-│       ├── sample-output-macos.txt        # macOS Docker Desktop results
-│       ├── sample-output-azure-premium.txt    # Azure Premium SSD results
-│       └── sample-output-azure-standard.txt   # Azure Standard HDD results
-├── security-configs/                      # Hardening guides
+├── research/                          # Measurement data & reproducibility
+│   ├── statistical-benchmark.sh       # 50-iteration benchmark runner
+│   ├── analyze_results.py             # Cross-platform comparison
+│   └── results/                       # Raw CSV data per platform
+├── toolkit/                           # Performance & security analysis
+│   ├── docker-analysis-toolkit.sh     # Main script
+│   └── examples/                      # Sample outputs
+├── security-configs/                  # Hardening guides
 │   ├── docker-security-hardening.md
-│   └── examples/
-└── README.md
+│   └── examples/                      # Seccomp, AppArmor configs
+└── tests/                             # Individual test scripts
 ```
 
 ---
 
-## 🔬 Sample Results
-
-The toolkit has been validated across three infrastructure tiers:
-
-### Development Tier (macOS Docker Desktop)
-- Runtime overhead: **303ms**
-- Copy-up (100MB): **88ms**
-- CPU throttling accuracy: **99.36%** (50.32% measured vs 50% target)
-- Platform: MacBook Pro, Docker Desktop 28.4.0
-
-### Production-Optimized (Azure Premium SSD)
-- Runtime overhead: **501ms** 
-- Copy-up (100MB): **64ms**
-- CPU throttling accuracy: **99.94%** (49.97% measured vs 50% target)
-- Platform: Standard_D2s_v3, Premium SSD
-
-### Production-Budget (Azure Standard HDD)
-- Runtime overhead: **837ms**
-- Copy-up (100MB): **63ms**
-- CPU throttling accuracy: **99.66%** (50.17% measured vs 50% target)
-- Platform: Standard_D2s_v3, Standard HDD
-
-**Key Finding:** Container startup decomposes into invariant kernel operations (~10ms) and variable infrastructure operations (200-600ms). See the published article for complete analysis.
-
----
-
-## 💡 Key Findings from Three-Tier Analysis
-
-### 1. **Runtime Overhead Decomposition**
-- Kernel operations (namespace creation, cgroup setup): Single-digit milliseconds
-- Storage operations (OverlayFS mount, disk I/O): 300-800ms (platform-dependent)
-- Platform overhead (containerd shim, managed disk): 100-300ms in cloud
-
-### 2. **Copy-up is Architecturally Consistent**
-- 60-90ms for 100MB file across all platforms
-- Proves it's an architectural operation with minimal storage dependency
-
-### 3. **CPU Throttling is Truly Invariant**
-- All platforms: 49.97% - 50.32% measured vs 50% target
-- <1% variance proves kernel-level determinism
-
-### 4. **Storage Tier Matters for I/O**
-- OverlayFS writes: 140 MB/s (HDD) → 354 MB/s (Premium SSD) → 1.8 GB/s (macOS)
-- Metadata operations: 2-5% overhead regardless of storage tier
-
----
-
-## 🛠️ Installation
+## Installation
 
 **Ubuntu/Debian:**
 ```bash
-sudo apt-get update
 sudo apt-get install -y docker.io strace jq linux-tools-generic
 ```
 
-**macOS:**
+**RHEL/CentOS:**
 ```bash
-# Install Docker Desktop from docker.com
-# Most tools (strace, perf) not available on macOS
-# The script will skip unsupported tests automatically
+sudo dnf install -y docker strace jq perf
 ```
 
 ---
 
-## 🔐 Security Hardening Example
+## Security Quick Start
+
 ```bash
-# Production-ready container configuration
 docker run -d \
-  --name secure-nginx \
   --cap-drop=ALL \
   --cap-add=NET_BIND_SERVICE \
   --read-only \
   --tmpfs /tmp \
-  --tmpfs /var/run \
   --security-opt=no-new-privileges \
-  --memory=512m \
-  --cpus=0.5 \
   nginx:alpine
 ```
 
-See `security-configs/` for comprehensive hardening guide.
+See `security-configs/` for the complete hardening guide.
 
 ---
 
-## 📚 Platform-Specific Notes
+## Related Resources
 
-### macOS Docker Desktop
-- Volume mount tests are skipped (APFS/LinuxKit compatibility issues)
-- Some system inspection tests require Linux kernel features
-- Results still valuable for development baseline measurements
-
-### Linux (Native Docker)
-- Full test suite supported
-- Requires sudo/root for namespace and capability inspection
-- Tested on Ubuntu 22.04 with kernel 6.8
-
-### Cloud Platforms (Azure, AWS, GCP)
-- Managed disk caching affects I/O results
-- CPU steal time may add variance in shared tenancy
-- Network-attached storage (EBS, Azure Disk) adds latency
+- [Docker Security Practical Guide](https://opscart.com) — Hands-on labs
+- [OCI Runtime Specification](https://github.com/opencontainers/runtime-spec)
+- [DZone: AI-Assisted Kubernetes Diagnostics](https://dzone.com/users/5765486/opscart.html) — Related DevOps articles
 
 ---
 
-## 🎯 Use Cases
+## License
 
-**For Learning:**
-- Understand how Docker primitives work under the hood
-- See actual kernel behavior (namespaces, cgroups, OverlayFS)
-- Compare your environment to research baselines
-
-**For Infrastructure Decisions:**
-- Quantify storage tier impact (Premium SSD vs Standard HDD)
-- Understand when optimization matters vs when it doesn't
-- Establish baseline performance for your platform
-
-**For Security Auditing:**
-- Identify privileged containers and Docker socket mounts
-- Verify capability restrictions
-- Check namespace isolation
+MIT License — Free for personal and commercial use.
 
 ---
 
-## 🤝 Contributing
-
-This is a research repository accompanying published articles. If you find issues or have suggestions:
-
-1. Open an issue describing the problem
-2. Include your platform (OS, Docker version, kernel version)
-3. Attach relevant output from the toolkit
-
-Pull requests for bug fixes are welcome.
-
----
-
-## 📜 License
-
-MIT License - Free for personal and commercial use.
-
----
-
-## 👤 Author
+## Author
 
 **Shamsher Khan**
-- Senior DevOps Engineer | IEEE Senior Member
-- Blog: [opscart.com](https://opscart.com)
+Senior DevOps Engineer, GlobalLogic (Hitachi Group)
+IEEE Senior Member
+
 - GitHub: [@opscart](https://github.com/opscart)
-- LinkedIn: [Shamsher Khan](https://linkedin.com/in/shamsher-khan)
-- DZone: [@shamsherkhan](https://dzone.com/users/4855907/shamsherkhan.html)
+- Blog: [OpsCart.com](https://opscart.com)
 
 ---
 
-## ⭐ If You Find This Useful
-
-- Star this repository
-- Share the accompanying article
-- Reference in your own research or blog posts
-- Provide feedback on what else you'd like to see measured
-
----
-
-**Last Updated:** January 2025
-**Status:** Active
+**Status:** Research Complete — Data Collection Finalized
